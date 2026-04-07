@@ -20,5 +20,10 @@ export async function GET() {
     reserve: row.reserve || null,
   }));
 
-  return Response.json({ participants });
+  return new Response(JSON.stringify({ participants }), {
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-store, no-cache, must-revalidate',
+    },
+  });
 }
