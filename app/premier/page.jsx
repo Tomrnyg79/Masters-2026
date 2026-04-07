@@ -25,58 +25,77 @@ export default function PremierPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="text-white py-5 px-4 shadow-lg" style={{ backgroundColor: AUGUSTA_GREEN }}>
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">🏆 Masters 2026 — Premier</h1>
-            <p className="text-green-200 text-sm mt-0.5">Oppdateres automatisk ved nye registreringer</p>
+      {/* Header */}
+      <div className="text-white shadow-lg" style={{ backgroundColor: AUGUSTA_GREEN }}>
+        <div style={{ maxWidth: 680, margin: '0 auto', padding: '16px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+          <div style={{ minWidth: 0 }}>
+            <h1 style={{ fontSize: 'clamp(17px, 5vw, 22px)', fontWeight: 700, lineHeight: 1.2 }}>
+              🏆 Masters 2026 — Premier
+            </h1>
+            <p style={{ color: '#86efac', fontSize: 13, marginTop: 2 }}>Oppdateres automatisk ved nye registreringer</p>
           </div>
-          <Link href="/" className="text-green-200 hover:text-white text-sm">← Tilbake</Link>
+          <Link href="/" style={{
+            color: '#86efac', fontSize: 14, textDecoration: 'none',
+            padding: '10px 12px', minHeight: 44, display: 'flex', alignItems: 'center',
+            borderRadius: 8, flexShrink: 0,
+          }}>← Tilbake</Link>
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+      <div style={{ maxWidth: 680, margin: '0 auto', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
 
         {/* Pott-oversikt */}
-        <div style={{ background: AUGUSTA_GREEN, borderRadius: 12, padding: 28, textAlign: 'center', color: '#fff' }}>
-          <div style={{ fontSize: 13, textTransform: 'uppercase', letterSpacing: 2, opacity: 0.8, marginBottom: 8 }}>
+        <div style={{
+          background: AUGUSTA_GREEN, borderRadius: 12, padding: '28px 20px',
+          textAlign: 'center', color: '#fff',
+        }}>
+          <div style={{ fontSize: 13, textTransform: 'uppercase', letterSpacing: 2, opacity: 0.8, marginBottom: 10 }}>
             Total premiepott
           </div>
-          <div style={{ fontSize: 56, fontWeight: 800, lineHeight: 1 }}>
+          <div style={{
+            fontSize: 'clamp(36px, 12vw, 60px)',
+            fontWeight: 800, lineHeight: 1, letterSpacing: -1,
+          }}>
             {count === null ? '...' : `${pot.toLocaleString('nb-NO')} kr`}
           </div>
-          <div style={{ marginTop: 12, opacity: 0.85, fontSize: 15 }}>
+          <div style={{ marginTop: 12, opacity: 0.85, fontSize: 16 }}>
             {count === null ? '' : `${count} deltaker${count !== 1 ? 'e' : ''} × 200 kr`}
           </div>
-          <div style={{ marginTop: 16, background: 'rgba(255,255,255,0.15)', borderRadius: 8, padding: '8px 16px', display: 'inline-block', fontSize: 13 }}>
+          <div style={{
+            marginTop: 16, background: 'rgba(255,255,255,0.15)',
+            borderRadius: 8, padding: '10px 16px', display: 'inline-block', fontSize: 14,
+          }}>
             Potten vokser med 200 kr per nye deltaker 📈
           </div>
         </div>
 
         {/* Premifordeling */}
-        <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', padding: 24 }}>
+        <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', padding: '20px 16px' }}>
           <h2 style={{ fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 20 }}>Premifordeling</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {PRIZES.map(prize => {
               const amount = Math.floor(pot * prize.pct);
               return (
                 <div key={prize.place} style={{
-                  display: 'flex', alignItems: 'center', gap: 16,
-                  padding: 16, borderRadius: 10,
+                  display: 'flex', alignItems: 'center', gap: 14,
+                  padding: '16px 14px', borderRadius: 10,
                   background: prize.place === 1 ? '#fffbeb' : '#f9fafb',
                   border: prize.place === 1 ? '2px solid #fde68a' : '1px solid #f3f4f6',
                 }}>
-                  <span style={{ fontSize: 36 }}>{prize.medal}</span>
-                  <div style={{ flex: 1 }}>
+                  <span style={{ fontSize: 38, flexShrink: 0, lineHeight: 1 }}>{prize.medal}</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 700, color: '#111827', fontSize: 16 }}>{prize.label}</div>
-                    <div style={{ color: '#6b7280', fontSize: 13, marginTop: 2 }}>{prize.pct * 100}% av potten</div>
+                    <div style={{ color: '#6b7280', fontSize: 14, marginTop: 2 }}>{prize.pct * 100}% av potten</div>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: 28, fontWeight: 800, color: prize.color }}>
+                  <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                    <div style={{
+                      fontSize: 'clamp(20px, 6vw, 28px)',
+                      fontWeight: 800, color: prize.color, lineHeight: 1,
+                    }}>
                       {count === null ? '...' : `${amount.toLocaleString('nb-NO')} kr`}
                     </div>
                     {count !== null && count < 10 && (
-                      <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>
+                      <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 4 }}>
                         ved {count} deltakere
                       </div>
                     )}
@@ -87,10 +106,13 @@ export default function PremierPage() {
           </div>
         </div>
 
-
-        <div style={{ textAlign: 'center', paddingTop: 4 }}>
-          <Link href="/regler"
-            style={{ color: AUGUSTA_GREEN, textDecoration: 'underline', fontSize: 14 }}>
+        {/* CTA */}
+        <div style={{ textAlign: 'center', paddingBottom: 8 }}>
+          <Link href="/regler" style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            color: AUGUSTA_GREEN, textDecoration: 'underline', fontSize: 15,
+            padding: '12px 16px', minHeight: 44,
+          }}>
             Les alle reglene →
           </Link>
         </div>

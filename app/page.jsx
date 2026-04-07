@@ -17,17 +17,14 @@ function formatTeeTime(isoString) {
   });
 }
 
-// Returner aktiv runde (i dag) eller neste kommende runde
 function getActiveRound(teeTimes) {
   const now = new Date();
   const today = now.toISOString().split('T')[0];
-  // Sjekk om noen runde spilles i dag
   for (const playerRounds of Object.values(teeTimes)) {
     for (const r of playerRounds) {
       if (r.teeTime && r.teeTime.startsWith(today)) return { round: r.round, label: 'i dag' };
     }
   }
-  // Finn neste kommende runde
   let next = null;
   for (const playerRounds of Object.values(teeTimes)) {
     for (const r of playerRounds) {
@@ -42,7 +39,6 @@ function getActiveRound(teeTimes) {
   return null;
 }
 
-// Beregn statistikk om picks
 function calcStats(participants) {
   const playerCount = {};
   const pickSets = [];
@@ -55,12 +51,10 @@ function calcStats(participants) {
     }
   }
 
-  // Mest valgte spillere (topp 5)
   const topPicks = Object.entries(playerCount)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5);
 
-  // Finn grupper med identiske picks
   const groups = {};
   for (const { name, key } of pickSets) {
     if (!groups[key]) groups[key] = [];
@@ -72,20 +66,25 @@ function calcStats(participants) {
 }
 
 function RankBadge({ rank }) {
-  if (rank === 1) return <span className="text-xl">🥇</span>;
-  if (rank === 2) return <span className="text-xl">🥈</span>;
-  if (rank === 3) return <span className="text-xl">🥉</span>;
-  return <span className="font-bold text-gray-600 w-6 text-center inline-block">{rank}</span>;
+  if (rank === 1) return <span style={{ fontSize: 22 }}>🥇</span>;
+  if (rank === 2) return <span style={{ fontSize: 22 }}>🥈</span>;
+  if (rank === 3) return <span style={{ fontSize: 22 }}>🥉</span>;
+  return (
+    <span style={{
+      fontWeight: 700, color: '#6b7280', width: 28, textAlign: 'center',
+      display: 'inline-block', fontSize: 15,
+    }}>{rank}</span>
+  );
 }
 
 function ToParBadge({ toPar }) {
   if (!toPar || toPar === 'E' || toPar === '0') {
-    return <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-gray-100 text-gray-600">E</span>;
+    return <span style={{ padding: '2px 6px', borderRadius: 4, fontSize: 12, fontWeight: 700, background: '#f3f4f6', color: '#4b5563' }}>E</span>;
   }
   const num = parseInt(toPar);
-  if (isNaN(num)) return <span className="text-xs text-gray-500">{toPar}</span>;
-  if (num < 0) return <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-red-100 text-red-700">{toPar}</span>;
-  return <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-700">+{num}</span>;
+  if (isNaN(num)) return <span style={{ fontSize: 12, color: '#6b7280' }}>{toPar}</span>;
+  if (num < 0) return <span style={{ padding: '2px 6px', borderRadius: 4, fontSize: 12, fontWeight: 700, background: '#fee2e2', color: '#b91c1c' }}>{toPar}</span>;
+  return <span style={{ padding: '2px 6px', borderRadius: 4, fontSize: 12, fontWeight: 700, background: '#dbeafe', color: '#1d4ed8' }}>+{num}</span>;
 }
 
 function PlayerCell({ player, teeTimeRounds, todayRound }) {
@@ -103,16 +102,12 @@ function PlayerCell({ player, teeTimeRounds, todayRound }) {
         {isReserve && <span className="text-purple-500 text-xs font-bold">(R)</span>}
         <span className="font-medium text-gray-800 truncate max-w-[130px]" title={name}>{name}</span>
       </div>
-
-      {/* Score til par + thru */}
       {status !== 'MC' && status !== 'not_started' && toParNum !== undefined && (
         <div className="flex items-center gap-1 mb-0.5">
           <ToParBadge toPar={formatToPar(toParNum)} />
           {thru && <span className="text-xs text-gray-500">{thru}</span>}
         </div>
       )}
-
-      {/* Runde-scores */}
       {completedRounds.length > 0 && (
         <div className="flex gap-1 mb-0.5 flex-wrap">
           {[r1, r2, r3, r4].map((r, i) => r !== null && r !== undefined ? (
@@ -122,22 +117,16 @@ function PlayerCell({ player, teeTimeRounds, todayRound }) {
           ) : null)}
         </div>
       )}
-
-      {/* MC */}
       {status === 'MC' && (
         <div className="text-xs text-red-600 font-semibold">
           MC · R1:{r1} R2:{r2} +79+79 = {total} slag
         </div>
       )}
-
-      {/* Tee-tid */}
       {todayTT?.teeTime && (
         <div className="text-xs text-green-700 mt-0.5">
           ⏰ {formatTeeTime(todayTT.teeTime)}{todayTT.startTee === 10 && ' (hull 10)'}
         </div>
       )}
-
-      {/* Ikke startet */}
       {status === 'not_started' && (
         <div className="text-xs text-gray-400">Ikke startet (par 72)</div>
       )}
@@ -150,52 +139,58 @@ function WelcomeSection({ participants, tournamentStarted }) {
   const count = participants.length;
 
   return (
-    <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', border: '1px solid #d1fae5', padding: 24, marginBottom: 24 }}>
-      {/* Velkomsttekst */}
-      <div style={{ marginBottom: 20 }}>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#111827', marginBottom: 8 }}>
+    <div style={{
+      background: '#fff', borderRadius: 12,
+      boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+      border: '1px solid #d1fae5',
+      padding: '20px 16px',
+      marginBottom: 20,
+    }}>
+      <div style={{ marginBottom: 16 }}>
+        <h2 style={{ fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 8 }}>
           Velkommen til årets vakreste eventyr 🌸
         </h2>
-        <p style={{ color: '#4b5563', lineHeight: 1.6, marginBottom: 8 }}>
+        <p style={{ color: '#4b5563', lineHeight: 1.6, marginBottom: 8, fontSize: 15 }}>
           Tro mot tradisjonen samles vi igjen om Masters — golfens mest prestisjefylte turnering,
-          spilt på den ikoniske Augusta National Golf Club i Georgia. Grønne fairways, azaleaer i full
-          blomst, og noen av verdens beste golfspillere. Dette er Masters.
+          spilt på den ikoniske Augusta National Golf Club i Georgia.
         </p>
-        <p style={{ color: '#4b5563', lineHeight: 1.6 }}>
+        <p style={{ color: '#4b5563', lineHeight: 1.6, fontSize: 15 }}>
           Stillingslisten oppdateres <strong>automatisk hvert minutt</strong> så snart turneringen
-          starter torsdag 9. april. Du trenger aldri å refreshe — bare følg med mens dine spillere
-          jobber seg ned gjennom Augusta. Tee-tider, runde-scores og stillingen oppdateres fortløpende.
+          starter torsdag 9. april.
         </p>
       </div>
 
-      {/* Statistikk */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, paddingTop: 16, borderTop: '1px solid #f3f4f6' }}>
-        {/* Antall registrerte */}
-        <div style={{ textAlign: 'center', padding: 12, background: '#f0fdf4', borderRadius: 8 }}>
-          <div style={{ fontSize: 36, fontWeight: 800, color: AUGUSTA_GREEN }}>{count}</div>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+        gap: 12,
+        paddingTop: 16,
+        borderTop: '1px solid #f3f4f6',
+      }}>
+        <div style={{ textAlign: 'center', padding: '14px 12px', background: '#f0fdf4', borderRadius: 8 }}>
+          <div style={{ fontSize: 40, fontWeight: 800, color: AUGUSTA_GREEN }}>{count}</div>
           <div style={{ fontSize: 13, color: '#4b5563', marginTop: 2 }}>
             {count === 1 ? 'deltaker registrert' : 'deltakere registrert'}
           </div>
           {!tournamentStarted && (
-            <Link href="/register" style={{ fontSize: 12, color: AUGUSTA_GREEN, textDecoration: 'underline', display: 'block', marginTop: 4 }}>
+            <Link href="/register" style={{ fontSize: 13, color: AUGUSTA_GREEN, textDecoration: 'underline', display: 'block', marginTop: 6 }}>
               Registrer deg →
             </Link>
           )}
         </div>
 
-        {/* Mest valgte spillere */}
-        <div style={{ padding: 12, background: '#f9fafb', borderRadius: 8 }}>
+        <div style={{ padding: '14px 12px', background: '#f9fafb', borderRadius: 8 }}>
           <div style={{ fontSize: 11, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
             Mest valgte spillere
           </div>
           {topPicks.length === 0 ? (
-            <p style={{ fontSize: 12, color: '#9ca3af' }}>Ingen picks ennå</p>
+            <p style={{ fontSize: 13, color: '#9ca3af' }}>Ingen picks ennå</p>
           ) : (
             <ol>
               {topPicks.map(([name, n], i) => (
-                <li key={name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13, marginBottom: 3 }}>
+                <li key={name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13, marginBottom: 4 }}>
                   <span style={{ color: '#374151' }}>{i + 1}. {name}</span>
-                  <span style={{ fontSize: 11, fontWeight: 700, padding: '1px 6px', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 4, color: '#6b7280', marginLeft: 8 }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, padding: '1px 6px', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 4, color: '#6b7280', marginLeft: 8, flexShrink: 0 }}>
                     {n}x
                   </span>
                 </li>
@@ -204,19 +199,18 @@ function WelcomeSection({ participants, tournamentStarted }) {
           )}
         </div>
 
-        {/* Like picks */}
-        <div style={{ padding: 12, background: '#f9fafb', borderRadius: 8 }}>
+        <div style={{ padding: '14px 12px', background: '#f9fafb', borderRadius: 8 }}>
           <div style={{ fontSize: 11, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
             Like picks
           </div>
           {identical.length === 0 ? (
-            <p style={{ fontSize: 12, color: '#6b7280' }}>
+            <p style={{ fontSize: 13, color: '#6b7280' }}>
               {count < 2 ? 'Venter på flere deltakere' : 'Ingen har valgt nøyaktig samme 4 spillere 👏'}
             </p>
           ) : (
             <div>
               {identical.map((group, i) => (
-                <div key={i} style={{ fontSize: 12, marginBottom: 4 }}>
+                <div key={i} style={{ fontSize: 13, marginBottom: 4 }}>
                   <span style={{ color: '#d97706', fontWeight: 600 }}>Identiske: </span>
                   <span style={{ color: '#4b5563' }}>{group.join(' & ')}</span>
                 </div>
@@ -268,7 +262,6 @@ export default function Home() {
     setTeeTimeData(data.teeTimes || {});
   }, []);
 
-
   useEffect(() => {
     fetchAll().then(loaded => fetchTeeTimes(loaded));
     const s = setInterval(fetchAll, SCORE_REFRESH);
@@ -300,83 +293,125 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="text-white py-5 px-4 shadow-lg" style={{ backgroundColor: AUGUSTA_GREEN }}>
-        <div className="max-w-screen-xl mx-auto flex items-center justify-between flex-wrap gap-3">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">⛳ Masters 2026 Konkurranse</h1>
-            <p className="text-green-200 text-sm mt-0.5">Augusta National · 9–12. april 2026</p>
-          </div>
-          <div className="flex items-center gap-2 flex-wrap justify-end">
-            <Link href="/regler" className="text-green-200 hover:text-white text-sm px-2 py-1">Regler</Link>
-            <Link href="/premier" className="text-green-200 hover:text-white text-sm px-2 py-1">Premier</Link>
-            {user === undefined ? null : user ? (
-              <>
-                <span className="text-green-200 text-sm hidden md:block">Hei, {user.username} 👋</span>
-                <Link href="/mypicks" className="bg-white text-green-800 font-semibold px-3 py-1.5 rounded-lg text-sm hover:bg-green-50 transition">
-                  Mine picks
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link href="/login" className="text-green-200 hover:text-white text-sm px-2 py-1">Logg inn</Link>
-                <Link href="/register" className="bg-white text-green-800 font-semibold px-3 py-1.5 rounded-lg text-sm hover:bg-green-50 transition">
-                  Registrer
-                </Link>
-              </>
-            )}
+      <div className="text-white shadow-lg" style={{ backgroundColor: AUGUSTA_GREEN }}>
+        <div className="max-w-screen-xl mx-auto px-4 py-4">
+          {/* Top row: title + nav links always visible */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+            <div>
+              <h1 style={{ fontSize: 'clamp(18px, 5vw, 28px)', fontWeight: 700, lineHeight: 1.2 }}>
+                ⛳ Masters 2026 Konkurranse
+              </h1>
+              <p style={{ color: '#86efac', fontSize: 13, marginTop: 2 }}>Augusta National · 9–12. april 2026</p>
+            </div>
+            {/* Nav links — always visible, wrap gracefully */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+              <Link href="/regler" style={{
+                color: '#86efac', fontSize: 14, padding: '10px 12px',
+                minHeight: 44, display: 'flex', alignItems: 'center',
+                borderRadius: 8, textDecoration: 'none',
+              }}>Regler</Link>
+              <Link href="/premier" style={{
+                color: '#86efac', fontSize: 14, padding: '10px 12px',
+                minHeight: 44, display: 'flex', alignItems: 'center',
+                borderRadius: 8, textDecoration: 'none',
+              }}>Premier</Link>
+              {user === undefined ? null : user ? (
+                <>
+                  <span style={{ color: '#86efac', fontSize: 13 }}>Hei, {user.username} 👋</span>
+                  <Link href="/mypicks" style={{
+                    background: '#fff', color: '#166534', fontWeight: 600,
+                    padding: '10px 14px', borderRadius: 8, fontSize: 14,
+                    minHeight: 44, display: 'flex', alignItems: 'center',
+                    textDecoration: 'none',
+                  }}>Mine picks</Link>
+                </>
+              ) : (
+                <>
+                  <Link href="/login" style={{
+                    color: '#86efac', fontSize: 14, padding: '10px 12px',
+                    minHeight: 44, display: 'flex', alignItems: 'center',
+                    borderRadius: 8, textDecoration: 'none',
+                  }}>Logg inn</Link>
+                  <Link href="/register" style={{
+                    background: '#fff', color: '#166534', fontWeight: 600,
+                    padding: '10px 14px', borderRadius: 8, fontSize: 14,
+                    minHeight: 44, display: 'flex', alignItems: 'center',
+                    textDecoration: 'none',
+                  }}>Registrer</Link>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-screen-xl mx-auto px-2 md:px-4 py-5">
+      <div className="max-w-screen-xl mx-auto px-4 py-5">
 
-        {/* Velkomstseksjon */}
         <WelcomeSection participants={participants} tournamentStarted={tournamentStarted} />
 
-        {/* Turneringsstatus */}
-        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-          <div className="flex items-center gap-2 flex-wrap">
+        {/* Status bar */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
             {!tournamentStarted && !loading && (
-              <span className="px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+              <span style={{
+                padding: '8px 14px', borderRadius: 20, fontSize: 14, fontWeight: 500,
+                background: '#fef9c3', color: '#854d0e',
+              }}>
                 🗓 Starter torsdag 9. april 2026
               </span>
             )}
             {tournamentStarted && (
-              <span className="px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+              <span style={{
+                padding: '8px 14px', borderRadius: 20, fontSize: 14, fontWeight: 500,
+                background: '#dcfce7', color: '#166534',
+              }}>
                 🟢 {scoreData?.eventName} · Runde {scoreData?.currentRound}
               </span>
             )}
             {activeRoundInfo && (
-              <span className="px-3 py-1 rounded-full text-sm bg-blue-50 text-blue-700">
+              <span style={{
+                padding: '8px 14px', borderRadius: 20, fontSize: 14,
+                background: '#eff6ff', color: '#1d4ed8',
+              }}>
                 Runde {activeRoundInfo.round} {activeRoundInfo.label}
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-500">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#6b7280' }}>
             {lastUpdated && <span>Oppdatert {lastUpdated.toLocaleTimeString('nb-NO')}</span>}
-            <button onClick={fetchAll} disabled={loading}
-              className="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50">
-              {loading ? '...' : '↻'}
+            <button
+              onClick={fetchAll}
+              disabled={loading}
+              style={{
+                padding: '8px 14px', borderRadius: 6, border: '1px solid #d1d5db',
+                background: '#fff', fontSize: 14, minHeight: 36, cursor: 'pointer',
+                opacity: loading ? 0.5 : 1,
+              }}
+            >
+              {loading ? '...' : '↻ Oppdater'}
             </button>
           </div>
         </div>
 
         {/* Ingen picks ennå */}
         {standings.length === 0 && !loading && (
-          <div className="text-center py-12 text-gray-400 bg-white rounded-xl shadow-sm">
-            <p className="text-3xl mb-3">🏌️</p>
-            <p className="text-lg font-medium text-gray-600">Ingen picks registrert ennå</p>
-            <p className="text-sm mt-2">
-              <Link href="/register" className="font-medium underline" style={{ color: AUGUSTA_GREEN }}>
+          <div style={{
+            textAlign: 'center', padding: '40px 16px', background: '#fff',
+            borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+          }}>
+            <p style={{ fontSize: 40, marginBottom: 12 }}>🏌️</p>
+            <p style={{ fontSize: 17, fontWeight: 600, color: '#374151', marginBottom: 8 }}>Ingen picks registrert ennå</p>
+            <p style={{ fontSize: 15 }}>
+              <Link href="/register" style={{ color: AUGUSTA_GREEN, fontWeight: 600, textDecoration: 'underline' }}>
                 Vær den første til å registrere deg!
               </Link>
             </p>
           </div>
         )}
 
-        {/* Desktop-tabell */}
         {standings.length > 0 && (
           <>
+            {/* Desktop-tabell */}
             <div className="hidden lg:block overflow-x-auto rounded-lg shadow">
               <table className="min-w-full bg-white text-sm">
                 <thead>
@@ -412,38 +447,107 @@ export default function Home() {
               </table>
             </div>
 
-            {/* Mobil */}
-            <div className="lg:hidden space-y-3">
+            {/* Mobil-kort */}
+            <div className="lg:hidden" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {standings.map((entry) => (
-                <div key={entry.name} className="bg-white rounded-lg shadow overflow-hidden"
-                  style={{ borderLeft: `4px solid ${entry.rank === 1 ? '#d97706' : AUGUSTA_GREEN}` }}>
-                  <button className="w-full px-4 py-3 flex items-center justify-between"
-                    onClick={() => setExpandedRow(expandedRow === entry.name ? null : entry.name)}>
-                    <div className="flex items-center gap-2">
+                <div
+                  key={entry.name}
+                  style={{
+                    background: '#fff',
+                    borderRadius: 12,
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+                    overflow: 'hidden',
+                    borderLeft: `5px solid ${entry.rank === 1 ? '#d97706' : entry.rank === 2 ? '#9ca3af' : entry.rank === 3 ? '#92400e' : AUGUSTA_GREEN}`,
+                  }}
+                >
+                  <button
+                    style={{
+                      width: '100%', padding: '14px 16px',
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      background: 'none', border: 'none', cursor: 'pointer',
+                      minHeight: 64, textAlign: 'left',
+                    }}
+                    onClick={() => setExpandedRow(expandedRow === entry.name ? null : entry.name)}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
                       <RankBadge rank={entry.rank} />
-                      <span className="font-bold text-gray-900">{entry.name}</span>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontWeight: 700, fontSize: 16, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {entry.name}
+                        </div>
+                        {/* Show player names in collapsed state */}
+                        <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {entry.playerDetails.map(pd => pd?.name?.split(' ').pop()).filter(Boolean).join(' · ')}
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg font-bold">{entry.total} slag</span>
-                      <span className="text-gray-400 text-sm">{expandedRow === entry.name ? '▲' : '▼'}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, marginLeft: 8 }}>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{
+                          fontSize: 17, fontWeight: 800,
+                          color: entry.rank === 1 ? '#d97706' : '#111827',
+                        }}>
+                          {entry.total}
+                        </div>
+                        <div style={{ fontSize: 11, color: '#6b7280' }}>slag</div>
+                      </div>
+                      <span style={{ color: '#9ca3af', fontSize: 14 }}>
+                        {expandedRow === entry.name ? '▲' : '▼'}
+                      </span>
                     </div>
                   </button>
+
                   {expandedRow === entry.name && (
-                    <div className="px-4 pb-4 pt-1 grid grid-cols-2 gap-2 border-t border-gray-100">
-                      {entry.playerDetails.map((pd, j) => {
-                        const todayTT = pd.teeTimeRounds?.find(r => r.round === todayRound);
-                        return (
-                          <div key={j} className={`text-sm p-2 rounded ${pd.status === 'MC' ? 'bg-red-50' : pd.isReserve ? 'bg-purple-50' : 'bg-gray-50'}`}>
-                            <div className="font-medium truncate">{pd.isReserve && '(R) '}{pd.name}</div>
-                            <div className="flex gap-1 mt-0.5">
-                              {pd.toPar && <ToParBadge toPar={pd.toPar} />}
-                              {pd.thru && <span className="text-xs text-gray-500">{pd.thru}</span>}
+                    <div style={{ borderTop: '1px solid #f3f4f6', padding: '12px 16px' }}>
+                      {/* To-par total */}
+                      <div style={{ marginBottom: 12, fontSize: 13, color: '#6b7280' }}>
+                        Totalt: <strong style={{ color: '#111827' }}>{entry.total} slag</strong>
+                        {' '}({formatToPar(entry.total - 1152)} i forhold til par)
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                        {entry.playerDetails.map((pd, j) => {
+                          const todayTT = pd.teeTimeRounds?.find(r => r.round === todayRound);
+                          return (
+                            <div
+                              key={j}
+                              style={{
+                                padding: '10px 12px',
+                                borderRadius: 8,
+                                background: pd.status === 'MC' ? '#fef2f2' : pd.isReserve ? '#faf5ff' : '#f9fafb',
+                                border: pd.status === 'MC' ? '1px solid #fecaca' : pd.isReserve ? '1px solid #e9d5ff' : '1px solid #f3f4f6',
+                              }}
+                            >
+                              <div style={{ fontWeight: 600, fontSize: 14, color: '#111827', marginBottom: 4 }}>
+                                {pd.isReserve && <span style={{ color: '#7c3aed', fontSize: 11, fontWeight: 700, marginRight: 4 }}>(R)</span>}
+                                {pd.name}
+                              </div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                                {pd.toPar && <ToParBadge toPar={pd.toPar} />}
+                                {pd.thru && <span style={{ fontSize: 12, color: '#6b7280' }}>{pd.thru}</span>}
+                              </div>
+                              {pd.status === 'MC' && (
+                                <div style={{ fontSize: 12, color: '#dc2626', fontWeight: 600, marginTop: 4 }}>
+                                  MC · {pd.total} slag
+                                </div>
+                              )}
+                              {pd.r1 !== null && pd.r1 !== undefined && (
+                                <div style={{ fontSize: 11, color: '#6b7280', marginTop: 4, fontFamily: 'monospace' }}>
+                                  {[pd.r1, pd.r2, pd.r3, pd.r4].filter(r => r != null).map((r, i) => `R${i+1}:${r}`).join(' ')}
+                                </div>
+                              )}
+                              {todayTT?.teeTime && (
+                                <div style={{ fontSize: 12, color: '#15803d', marginTop: 4 }}>
+                                  ⏰ {formatTeeTime(todayTT.teeTime)}
+                                  {todayTT.startTee === 10 && ' (hull 10)'}
+                                </div>
+                              )}
+                              {pd.status === 'not_started' && (
+                                <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 4 }}>Ikke startet</div>
+                              )}
                             </div>
-                            {pd.status === 'MC' && <div className="text-xs text-red-600 font-semibold">MC · {pd.total}</div>}
-                            {todayTT?.teeTime && <div className="text-xs text-green-700">⏰ {formatTeeTime(todayTT.teeTime)}</div>}
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -452,11 +556,11 @@ export default function Home() {
           </>
         )}
 
-        <div className="mt-4 text-xs text-gray-400 flex flex-wrap gap-3">
+        <div style={{ marginTop: 16, fontSize: 12, color: '#9ca3af', display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           <span>🔴 MC = Misset cut → 79+79 for R3+R4</span>
           <span>🟣 (R) = Reserve brukt</span>
           <span>⏰ = Tee-tid norsk tid</span>
-          <span>↻ Scores oppdateres automatisk hvert minutt</span>
+          <span>↻ Scores oppdateres hvert minutt</span>
         </div>
       </div>
     </div>

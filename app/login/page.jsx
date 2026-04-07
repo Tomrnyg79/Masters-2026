@@ -35,17 +35,33 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <span className="text-5xl">⛳</span>
-          <h1 className="text-2xl font-bold mt-3 text-gray-900">Masters 2026</h1>
-          <p className="text-gray-500 text-sm mt-1">Logg inn</p>
+    <div style={{
+      minHeight: '100vh', background: '#f9fafb',
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      padding: '20px 16px',
+    }}>
+      <div style={{ width: '100%', maxWidth: 400 }}>
+        {/* Logo / title */}
+        <div style={{ textAlign: 'center', marginBottom: 28 }}>
+          <span style={{ fontSize: 56, lineHeight: 1 }}>⛳</span>
+          <h1 style={{ fontSize: 26, fontWeight: 800, marginTop: 12, color: '#111827', letterSpacing: -0.5 }}>
+            Masters 2026
+          </h1>
+          <p style={{ color: '#6b7280', fontSize: 16, marginTop: 4 }}>Logg inn</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow p-6 space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            background: '#fff', borderRadius: 16,
+            boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+            padding: '24px 20px',
+            display: 'flex', flexDirection: 'column', gap: 18,
+          }}
+        >
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label style={{ display: 'block', fontSize: 15, fontWeight: 600, color: '#374151', marginBottom: 8 }}>
               Brukernavn
             </label>
             <input
@@ -53,14 +69,18 @@ export default function LoginPage() {
               value={username}
               onChange={e => setUsername(e.target.value)}
               placeholder="Ditt navn"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600"
+              style={{
+                width: '100%', border: '1px solid #d1d5db', borderRadius: 10,
+                padding: '0 14px', height: 52, fontSize: 16, color: '#111827',
+                background: '#fff', outline: 'none', boxSizing: 'border-box',
+              }}
               required
               autoFocus
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label style={{ display: 'block', fontSize: 15, fontWeight: 600, color: '#374151', marginBottom: 8 }}>
               Passord
             </label>
             <input
@@ -68,34 +88,50 @@ export default function LoginPage() {
               value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder="Ditt passord"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600"
+              style={{
+                width: '100%', border: '1px solid #d1d5db', borderRadius: 10,
+                padding: '0 14px', height: 52, fontSize: 16, color: '#111827',
+                background: '#fff', outline: 'none', boxSizing: 'border-box',
+              }}
               required
             />
           </div>
 
           {error && (
-            <p className="text-red-600 text-sm bg-red-50 p-2 rounded">{error}</p>
+            <div style={{
+              background: '#fef2f2', border: '1px solid #fecaca',
+              borderRadius: 8, padding: '12px 14px',
+              color: '#dc2626', fontSize: 15,
+            }}>
+              {error}
+            </div>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full text-white py-2.5 rounded-lg font-semibold disabled:opacity-50 transition"
-            style={{ backgroundColor: AUGUSTA_GREEN }}
+            style={{
+              width: '100%', background: loading ? '#6b7280' : AUGUSTA_GREEN,
+              color: '#fff', border: 'none', borderRadius: 12,
+              padding: '0 20px', height: 54, fontSize: 17, fontWeight: 700,
+              cursor: loading ? 'not-allowed' : 'pointer',
+              transition: 'background 0.15s',
+              boxShadow: loading ? 'none' : '0 2px 8px rgba(0,103,71,0.3)',
+            }}
           >
             {loading ? 'Logger inn...' : 'Logg inn'}
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-4">
+        <p style={{ textAlign: 'center', fontSize: 15, color: '#6b7280', marginTop: 20 }}>
           Ny bruker?{' '}
-          <Link href="/register" className="font-medium" style={{ color: AUGUSTA_GREEN }}>
+          <Link href="/register" style={{ color: AUGUSTA_GREEN, fontWeight: 600, textDecoration: 'none' }}>
             Registrer deg her
           </Link>
         </p>
 
-        <p className="text-center mt-4">
-          <Link href="/" className="text-sm text-gray-400 hover:text-gray-600">
+        <p style={{ textAlign: 'center', marginTop: 16 }}>
+          <Link href="/" style={{ fontSize: 14, color: '#9ca3af', textDecoration: 'none' }}>
             ← Tilbake til stillingslisten
           </Link>
         </p>

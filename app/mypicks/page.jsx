@@ -90,7 +90,6 @@ export default function MyPicksPage() {
 
   const selectedPlayers = [picks.player1, picks.player2, picks.player3, picks.player4].filter(Boolean);
 
-  // Finn tee-tider for en spiller
   function getPlayerTeeTimes(playerName) {
     return teeTimes[playerName] || [];
   }
@@ -101,13 +100,13 @@ export default function MyPicksPage() {
     const withTimes = rounds.filter(r => r.teeTime);
     if (!withTimes.length) return null;
     return (
-      <div className="mt-1 space-y-0.5">
+      <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
         {withTimes.map(r => (
-          <div key={r.round} className="flex items-center gap-1.5 text-xs text-green-700">
+          <div key={r.round} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#15803d' }}>
             <span>⏰</span>
-            <span className="font-medium">R{r.round}:</span>
+            <span style={{ fontWeight: 600 }}>R{r.round}:</span>
             <span>{formatTeeDate(r.teeTime)} kl. {formatTeeTime(r.teeTime)}</span>
-            {r.startTee === 10 && <span className="text-gray-400">(hull 10)</span>}
+            {r.startTee === 10 && <span style={{ color: '#9ca3af' }}>(hull 10)</span>}
           </div>
         ))}
       </div>
@@ -119,11 +118,19 @@ export default function MyPicksPage() {
     const otherSelected = selectedPlayers.filter(p => p !== currentValue && !isReserve);
     return (
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+        <label style={{ display: 'block', fontSize: 15, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
+          {label}
+        </label>
         <select
           value={currentValue}
           onChange={e => setPicks(prev => ({ ...prev, [field]: e.target.value }))}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600 bg-white"
+          style={{
+            width: '100%', border: '1px solid #d1d5db', borderRadius: 10,
+            padding: '0 14px', height: 52, fontSize: 16,
+            background: '#fff', color: '#111827',
+            outline: 'none', boxSizing: 'border-box',
+            appearance: 'auto',
+          }}
           required={!isReserve}
         >
           <option value="">— Velg spiller —</option>
@@ -141,60 +148,93 @@ export default function MyPicksPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">Laster...</div>
+        <div style={{ color: '#6b7280', fontSize: 17 }}>Laster...</div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="text-white py-4 px-4 shadow" style={{ backgroundColor: AUGUSTA_GREEN }}>
-        <div className="max-w-lg mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold">⛳ Mine picks</h1>
-            <p className="text-green-200 text-sm">Innlogget som <strong>{user?.username}</strong></p>
+      {/* Header */}
+      <div style={{ backgroundColor: AUGUSTA_GREEN }} className="text-white shadow">
+        <div style={{ maxWidth: 560, margin: '0 auto', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+          <div style={{ minWidth: 0 }}>
+            <h1 style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.2 }}>⛳ Mine picks</h1>
+            <p style={{ color: '#86efac', fontSize: 13, marginTop: 2 }}>
+              Innlogget som <strong>{user?.username}</strong>
+            </p>
           </div>
-          <div className="flex gap-2">
-            <Link href="/" className="text-sm text-green-200 hover:text-white px-2 py-1">Stillingsliste</Link>
-            <button onClick={handleLogout} className="text-sm bg-green-800 hover:bg-green-900 px-3 py-1 rounded-lg">
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
+            <Link href="/" style={{
+              color: '#86efac', fontSize: 14, textDecoration: 'none',
+              padding: '10px 12px', minHeight: 44, display: 'flex', alignItems: 'center',
+              borderRadius: 8,
+            }}>Liste</Link>
+            <button
+              onClick={handleLogout}
+              style={{
+                fontSize: 14, background: 'rgba(0,0,0,0.25)', color: '#fff',
+                border: 'none', borderRadius: 8, padding: '10px 14px',
+                minHeight: 44, cursor: 'pointer', fontWeight: 500,
+              }}
+            >
               Logg ut
             </button>
           </div>
         </div>
       </div>
 
-      <div className="max-w-lg mx-auto px-4 py-6">
-        <div className="bg-white rounded-xl shadow p-6">
-          <p className="text-sm text-gray-500 mb-5">
-            Velg dine <strong>4 spillere</strong> + 1 reserve. Tee-tider vises automatisk under hver spiller du velger.
-            Du kan endre picks frem til turneringen starter torsdag 9. april.
+      <div style={{ maxWidth: 560, margin: '0 auto', padding: '16px 16px 32px' }}>
+        <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 6px rgba(0,0,0,0.08)', padding: '20px 16px' }}>
+          <p style={{ fontSize: 15, color: '#6b7280', marginBottom: 20, lineHeight: 1.6 }}>
+            Velg dine <strong>4 spillere</strong> + 1 reserve. Tee-tider vises under hver spiller du velger.
+            Du kan endre picks frem til turneringen starter <strong>torsdag 9. april kl. 09:00</strong>.
           </p>
 
-          <form onSubmit={handleSave} className="space-y-5">
+          <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             <PlayerSelect label="Spiller 1" field="player1" />
             <PlayerSelect label="Spiller 2" field="player2" />
             <PlayerSelect label="Spiller 3" field="player3" />
             <PlayerSelect label="Spiller 4" field="player4" />
 
-            <div className="border-t pt-4">
+            <div style={{ borderTop: '1px solid #f3f4f6', paddingTop: 20 }}>
               <PlayerSelect label="Reserve (valgfri)" field="reserve" isReserve />
-              <p className="text-xs text-gray-400 mt-1">
+              <p style={{ fontSize: 13, color: '#9ca3af', marginTop: 8, lineHeight: 1.5 }}>
                 Reserven trer inn kun hvis en av dine spillere trekker seg pga skade.
               </p>
             </div>
 
-            {error && <p className="text-red-600 text-sm bg-red-50 p-2 rounded">{error}</p>}
+            {error && (
+              <div style={{
+                background: '#fef2f2', border: '1px solid #fecaca',
+                borderRadius: 8, padding: '12px 14px',
+                color: '#dc2626', fontSize: 15,
+              }}>
+                {error}
+              </div>
+            )}
+
             {success && (
-              <p className="text-green-700 text-sm bg-green-50 p-3 rounded font-medium">
+              <div style={{
+                background: '#f0fdf4', border: '1px solid #bbf7d0',
+                borderRadius: 8, padding: '14px 16px',
+                color: '#15803d', fontSize: 15, fontWeight: 600,
+              }}>
                 ✓ Picks lagret! Lykke til! 🍀
-              </p>
+              </div>
             )}
 
             <button
               type="submit"
               disabled={saving}
-              className="w-full text-white py-3 rounded-lg font-semibold text-lg disabled:opacity-50"
-              style={{ backgroundColor: AUGUSTA_GREEN }}
+              style={{
+                width: '100%', background: saving ? '#6b7280' : AUGUSTA_GREEN,
+                color: '#fff', border: 'none', borderRadius: 12,
+                padding: '16px 20px', fontSize: 18, fontWeight: 700,
+                cursor: saving ? 'not-allowed' : 'pointer',
+                minHeight: 56, transition: 'background 0.15s',
+                boxShadow: saving ? 'none' : '0 2px 8px rgba(0,103,71,0.3)',
+              }}
             >
               {saving ? 'Lagrer...' : '💾 Lagre picks'}
             </button>
