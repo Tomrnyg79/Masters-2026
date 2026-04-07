@@ -294,64 +294,64 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="text-white shadow-lg" style={{ backgroundColor: AUGUSTA_GREEN }}>
-        <div className="max-w-screen-xl mx-auto px-4 py-4">
-          {/* Top row: title + nav links always visible */}
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-            <div>
-              <h1 style={{ fontSize: 'clamp(18px, 5vw, 28px)', fontWeight: 700, lineHeight: 1.2 }}>
-                ⛳ Masters 2026 Konkurranse
-              </h1>
-              <p style={{ color: '#86efac', fontSize: 13, marginTop: 2 }}>Augusta National · 9–12. april 2026</p>
-            </div>
-            {/* Nav links — always visible, wrap gracefully */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-              <Link href="/regler" style={{
-                color: '#86efac', fontSize: 14, padding: '10px 12px',
-                minHeight: 44, display: 'flex', alignItems: 'center',
-                borderRadius: 8, textDecoration: 'none',
-              }}>Regler</Link>
-              <Link href="/premier" style={{
-                color: '#86efac', fontSize: 14, padding: '10px 12px',
-                minHeight: 44, display: 'flex', alignItems: 'center',
-                borderRadius: 8, textDecoration: 'none',
-              }}>Premier</Link>
-              {user === undefined ? null : user ? (
-                <>
-                  <span style={{ color: '#86efac', fontSize: 13 }}>Hei, {user.username} 👋</span>
-                  <Link href="/mypicks" style={{
-                    background: '#fff', color: '#166534', fontWeight: 600,
-                    padding: '10px 14px', borderRadius: 8, fontSize: 14,
-                    minHeight: 44, display: 'flex', alignItems: 'center',
-                    textDecoration: 'none',
-                  }}>Mine valg</Link>
-                  <button
-                    onClick={async () => {
-                      await fetch('/api/auth/logout', { method: 'POST' });
-                      setUser(null);
-                    }}
-                    style={{
-                      fontSize: 14, background: 'rgba(0,0,0,0.25)', color: '#fff',
-                      border: 'none', borderRadius: 8, padding: '10px 14px',
-                      minHeight: 44, cursor: 'pointer', fontWeight: 500,
-                    }}
-                  >Logg ut</button>
-                </>
-              ) : (
-                <>
-                  <Link href="/login" style={{
-                    color: '#86efac', fontSize: 14, padding: '10px 12px',
-                    minHeight: 44, display: 'flex', alignItems: 'center',
-                    borderRadius: 8, textDecoration: 'none',
-                  }}>Logg inn</Link>
-                  <Link href="/register" style={{
-                    background: '#fff', color: '#166534', fontWeight: 600,
-                    padding: '10px 14px', borderRadius: 8, fontSize: 14,
-                    minHeight: 44, display: 'flex', alignItems: 'center',
-                    textDecoration: 'none',
-                  }}>Registrer</Link>
-                </>
-              )}
-            </div>
+        <div style={{ maxWidth: 680, margin: '0 auto', padding: '14px 16px' }}>
+          {/* Rad 1: Tittel */}
+          <div style={{ marginBottom: 10 }}>
+            <h1 style={{ fontSize: 'clamp(18px, 5vw, 26px)', fontWeight: 700, lineHeight: 1.2 }}>
+              ⛳ Masters 2026 Konkurranse
+            </h1>
+            <p style={{ color: '#86efac', fontSize: 13, marginTop: 2 }}>
+              Augusta National · 9–12. april 2026
+              {user ? <span> · {user.username}</span> : null}
+            </p>
+          </div>
+          {/* Rad 2: Nav */}
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <Link href="/regler" style={{
+              color: '#86efac', fontSize: 14, padding: '8px 12px',
+              minHeight: 40, display: 'flex', alignItems: 'center',
+              borderRadius: 8, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.2)',
+            }}>Regler</Link>
+            <Link href="/premier" style={{
+              color: '#86efac', fontSize: 14, padding: '8px 12px',
+              minHeight: 40, display: 'flex', alignItems: 'center',
+              borderRadius: 8, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.2)',
+            }}>Premier</Link>
+            {user === undefined ? null : user ? (
+              <>
+                <Link href="/mypicks" style={{
+                  background: '#fff', color: '#166534', fontWeight: 600,
+                  padding: '8px 14px', borderRadius: 8, fontSize: 14,
+                  minHeight: 40, display: 'flex', alignItems: 'center',
+                  textDecoration: 'none',
+                }}>Mine valg</Link>
+                <button
+                  onClick={async () => {
+                    await fetch('/api/auth/logout', { method: 'POST' });
+                    setUser(null);
+                  }}
+                  style={{
+                    fontSize: 14, background: 'rgba(0,0,0,0.25)', color: '#fff',
+                    border: 'none', borderRadius: 8, padding: '8px 14px',
+                    minHeight: 40, cursor: 'pointer', fontWeight: 500,
+                  }}
+                >Logg ut</button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" style={{
+                  color: '#86efac', fontSize: 14, padding: '8px 12px',
+                  minHeight: 40, display: 'flex', alignItems: 'center',
+                  borderRadius: 8, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.2)',
+                }}>Logg inn</Link>
+                <Link href="/register" style={{
+                  background: '#fff', color: '#166534', fontWeight: 600,
+                  padding: '8px 14px', borderRadius: 8, fontSize: 14,
+                  minHeight: 40, display: 'flex', alignItems: 'center',
+                  textDecoration: 'none',
+                }}>Registrer</Link>
+              </>
+            )}
           </div>
         </div>
       </div>
