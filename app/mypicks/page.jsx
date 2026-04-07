@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 const AUGUSTA_GREEN = '#006747';
+const DEADLINE = new Date('2026-04-09T11:40:00Z'); // 13:40 norsk tid (CEST)
 
 function formatTeeTime(isoString) {
   if (!isoString) return null;
@@ -88,6 +89,7 @@ export default function MyPicksPage() {
     router.push('/');
   }
 
+  const locked = new Date() >= DEADLINE;
   const selectedPlayers = [picks.player1, picks.player2, picks.player3, picks.player4].filter(Boolean);
 
   function getPlayerTeeTimes(playerName) {
@@ -123,13 +125,14 @@ export default function MyPicksPage() {
         </label>
         <select
           value={currentValue}
-          onChange={e => setPicks(prev => ({ ...prev, [field]: e.target.value }))}
+          onChange={e => !locked && setPicks(prev => ({ ...prev, [field]: e.target.value }))}
+          disabled={locked}
           style={{
             width: '100%', border: '1px solid #d1d5db', borderRadius: 10,
             padding: '0 14px', height: 52, fontSize: 16,
-            background: '#fff', color: '#111827',
+            background: locked ? '#f3f4f6' : '#fff', color: '#111827',
             outline: 'none', boxSizing: 'border-box',
-            appearance: 'auto',
+            appearance: 'auto', cursor: locked ? 'not-allowed' : 'auto',
           }}
           required={!isReserve}
         >
@@ -159,7 +162,7 @@ export default function MyPicksPage() {
       <div style={{ backgroundColor: AUGUSTA_GREEN }} className="text-white shadow">
         <div style={{ maxWidth: 560, margin: '0 auto', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <div style={{ minWidth: 0 }}>
-            <h1 style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.2 }}>⛳ Mine picks</h1>
+            <h1 style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.2 }}>⛳ Mine valg</h1>
             <p style={{ color: '#86efac', fontSize: 13, marginTop: 2 }}>
               Innlogget som <strong>{user?.username}</strong>
             </p>
@@ -186,10 +189,20 @@ export default function MyPicksPage() {
 
       <div style={{ maxWidth: 560, margin: '0 auto', padding: '16px 16px 32px' }}>
         <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 6px rgba(0,0,0,0.08)', padding: '20px 16px' }}>
-          <p style={{ fontSize: 15, color: '#6b7280', marginBottom: 20, lineHeight: 1.6 }}>
-            Velg dine <strong>4 spillere</strong> + 1 reserve. Tee-tider vises under hver spiller du velger.
-            Du kan endre picks frem til turneringen starter <strong>torsdag 9. april kl. 09:00</strong>.
-          </p>
+          {locked ? (
+            <div style={{
+              background: '#fef9c3', border: '1px solid #fde68a',
+              borderRadius: 8, padding: '12px 14px', marginBottom: 20,
+              color: '#854d0e', fontSize: 15, fontWeight: 600,
+            }}>
+              🔒 Fristen er passert — valg kan ikke lenger endres.
+            </div>
+          ) : (
+            <p style={{ fontSize: 15, color: '#6b7280', marginBottom: 20, lineHeight: 1.6 }}>
+              Velg dine <strong>4 spillere</strong> + 1 reserve. Tee-tider vises under hver spiller du velger.
+              Du kan endre valg frem til turneringen starter <strong>torsdag 9. april kl. 13:40</strong>.
+            </p>
+          )}
 
           <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             <PlayerSelect label="Spiller 1" field="player1" />
@@ -220,24 +233,26 @@ export default function MyPicksPage() {
                 borderRadius: 8, padding: '14px 16px',
                 color: '#15803d', fontSize: 15, fontWeight: 600,
               }}>
-                ✓ Picks lagret! Lykke til! 🍀
+                ✓ Valg lagret! Lykke til! 🍀
               </div>
             )}
 
-            <button
-              type="submit"
-              disabled={saving}
-              style={{
-                width: '100%', background: saving ? '#6b7280' : AUGUSTA_GREEN,
-                color: '#fff', border: 'none', borderRadius: 12,
-                padding: '16px 20px', fontSize: 18, fontWeight: 700,
-                cursor: saving ? 'not-allowed' : 'pointer',
-                minHeight: 56, transition: 'background 0.15s',
-                boxShadow: saving ? 'none' : '0 2px 8px rgba(0,103,71,0.3)',
-              }}
-            >
-              {saving ? 'Lagrer...' : '💾 Lagre picks'}
-            </button>
+            {!locked && (
+              <button
+                type="submit"
+                disabled={saving}
+                style={{
+                  width: '100%', background: saving ? '#6b7280' : AUGUSTA_GREEN,
+                  color: '#fff', border: 'none', borderRadius: 12,
+                  padding: '16px 20px', fontSize: 18, fontWeight: 700,
+                  cursor: saving ? 'not-allowed' : 'pointer',
+                  minHeight: 56, transition: 'background 0.15s',
+                  boxShadow: saving ? 'none' : '0 2px 8px rgba(0,103,71,0.3)',
+                }}
+              >
+                {saving ? 'Lagrer...' : '💾 Lagre valg'}
+              </button>
+            )}
           </form>
         </div>
       </div>

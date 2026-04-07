@@ -68,11 +68,11 @@ export default function ReglerPage() {
             </div>
 
             <div style={{ borderLeft: '4px solid #f59e0b', paddingLeft: 16 }}>
-              <div style={{ fontWeight: 600, color: '#111827', marginBottom: 6, fontSize: 15 }}>⏰ Siste frist for picks</div>
+              <div style={{ fontWeight: 600, color: '#111827', marginBottom: 6, fontSize: 15 }}>⏰ Siste frist for valg</div>
               <div style={{ color: '#4b5563', fontSize: 15, lineHeight: 1.6 }}>
-                Alle picks må være registrert <strong>før torsdag 9. april kl. 09:00</strong> —
+                Alle valg må være registrert <strong>før torsdag 9. april kl. 13:40</strong> —
                 når den første gruppen teer av på Augusta National.
-                Picks kan endres frem til denne fristen.
+                Valg kan endres frem til denne fristen.
               </div>
             </div>
 

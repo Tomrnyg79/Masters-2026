@@ -184,7 +184,7 @@ function WelcomeSection({ participants, tournamentStarted }) {
             Mest valgte spillere
           </div>
           {topPicks.length === 0 ? (
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>Ingen picks ennå</p>
+            <p style={{ fontSize: 13, color: '#9ca3af' }}>Ingen valg ennå</p>
           ) : (
             <ol>
               {topPicks.map(([name, n], i) => (
@@ -201,7 +201,7 @@ function WelcomeSection({ participants, tournamentStarted }) {
 
         <div style={{ padding: '14px 12px', background: '#f9fafb', borderRadius: 8 }}>
           <div style={{ fontSize: 11, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
-            Like picks
+            Like valg
           </div>
           {identical.length === 0 ? (
             <p style={{ fontSize: 13, color: '#6b7280' }}>
@@ -323,7 +323,18 @@ export default function Home() {
                     padding: '10px 14px', borderRadius: 8, fontSize: 14,
                     minHeight: 44, display: 'flex', alignItems: 'center',
                     textDecoration: 'none',
-                  }}>Mine picks</Link>
+                  }}>Mine valg</Link>
+                  <button
+                    onClick={async () => {
+                      await fetch('/api/auth/logout', { method: 'POST' });
+                      setUser(null);
+                    }}
+                    style={{
+                      fontSize: 14, background: 'rgba(0,0,0,0.25)', color: '#fff',
+                      border: 'none', borderRadius: 8, padding: '10px 14px',
+                      minHeight: 44, cursor: 'pointer', fontWeight: 500,
+                    }}
+                  >Logg ut</button>
                 </>
               ) : (
                 <>
@@ -400,7 +411,7 @@ export default function Home() {
             borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
           }}>
             <p style={{ fontSize: 40, marginBottom: 12 }}>🏌️</p>
-            <p style={{ fontSize: 17, fontWeight: 600, color: '#374151', marginBottom: 8 }}>Ingen picks registrert ennå</p>
+            <p style={{ fontSize: 17, fontWeight: 600, color: '#374151', marginBottom: 8 }}>Ingen valg registrert ennå</p>
             <p style={{ fontSize: 15 }}>
               <Link href="/register" style={{ color: AUGUSTA_GREEN, fontWeight: 600, textDecoration: 'underline' }}>
                 Vær den første til å registrere deg!

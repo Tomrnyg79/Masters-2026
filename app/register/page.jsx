@@ -119,7 +119,7 @@ export default function RegisterPage() {
               boxShadow: loading ? 'none' : '0 2px 8px rgba(0,103,71,0.3)',
             }}
           >
-            {loading ? 'Oppretter...' : 'Registrer og velg spillere →'}
+            {loading ? 'Oppretter...' : 'Registrer og gjør dine valg →'}
           </button>
         </form>
 
