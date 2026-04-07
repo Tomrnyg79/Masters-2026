@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { supabase } from '../../../lib/supabase';
 
 // Hent alle deltakere og picks for stillingslisten (public)
