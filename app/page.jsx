@@ -122,50 +122,52 @@ function WelcomeSection({ participants, tournamentStarted }) {
   const count = participants.length;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-green-100 p-6 mb-6">
+    <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', border: '1px solid #d1fae5', padding: 24, marginBottom: 24 }}>
       {/* Velkomsttekst */}
-      <div className="mb-5">
-        <h2 className="text-xl font-bold text-gray-900 mb-2">
+      <div style={{ marginBottom: 20 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#111827', marginBottom: 8 }}>
           Velkommen til årets vakreste eventyr 🌸
         </h2>
-        <p className="text-gray-600 leading-relaxed">
+        <p style={{ color: '#4b5563', lineHeight: 1.6, marginBottom: 8 }}>
           Tro mot tradisjonen samles vi igjen om Masters — golfens mest prestisjefylte turnering,
           spilt på den ikoniske Augusta National Golf Club i Georgia. Grønne fairways, azaleaer i full
           blomst, og noen av verdens beste golfspillere. Dette er Masters.
         </p>
-        <p className="text-gray-600 leading-relaxed mt-2">
-          Stillingslisten her oppdateres <strong>automatisk hvert minutt</strong> så snart turneringen
+        <p style={{ color: '#4b5563', lineHeight: 1.6 }}>
+          Stillingslisten oppdateres <strong>automatisk hvert minutt</strong> så snart turneringen
           starter torsdag 9. april. Du trenger aldri å refreshe — bare følg med mens dine spillere
           jobber seg ned gjennom Augusta. Tee-tider, runde-scores og stillingen oppdateres fortløpende.
         </p>
       </div>
 
       {/* Statistikk */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, paddingTop: 16, borderTop: '1px solid #f3f4f6' }}>
         {/* Antall registrerte */}
-        <div className="text-center p-3 bg-green-50 rounded-lg">
-          <div className="text-3xl font-bold" style={{ color: AUGUSTA_GREEN }}>{count}</div>
-          <div className="text-sm text-gray-600 mt-0.5">
+        <div style={{ textAlign: 'center', padding: 12, background: '#f0fdf4', borderRadius: 8 }}>
+          <div style={{ fontSize: 36, fontWeight: 800, color: AUGUSTA_GREEN }}>{count}</div>
+          <div style={{ fontSize: 13, color: '#4b5563', marginTop: 2 }}>
             {count === 1 ? 'deltaker registrert' : 'deltakere registrert'}
           </div>
           {!tournamentStarted && (
-            <Link href="/register" className="text-xs underline mt-1 block" style={{ color: AUGUSTA_GREEN }}>
+            <Link href="/register" style={{ fontSize: 12, color: AUGUSTA_GREEN, textDecoration: 'underline', display: 'block', marginTop: 4 }}>
               Registrer deg →
             </Link>
           )}
         </div>
 
         {/* Mest valgte spillere */}
-        <div className="p-3 bg-gray-50 rounded-lg">
-          <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Mest valgte spillere</div>
+        <div style={{ padding: 12, background: '#f9fafb', borderRadius: 8 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
+            Mest valgte spillere
+          </div>
           {topPicks.length === 0 ? (
-            <p className="text-xs text-gray-400">Ingen picks ennå</p>
+            <p style={{ fontSize: 12, color: '#9ca3af' }}>Ingen picks ennå</p>
           ) : (
-            <ol className="space-y-0.5">
+            <ol>
               {topPicks.map(([name, n], i) => (
-                <li key={name} className="flex items-center justify-between text-sm">
-                  <span className="text-gray-700 truncate">{i + 1}. {name}</span>
-                  <span className="text-xs font-bold ml-2 px-1.5 py-0.5 bg-white rounded border text-gray-600">
+                <li key={name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13, marginBottom: 3 }}>
+                  <span style={{ color: '#374151' }}>{i + 1}. {name}</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, padding: '1px 6px', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 4, color: '#6b7280', marginLeft: 8 }}>
                     {n}x
                   </span>
                 </li>
@@ -174,19 +176,21 @@ function WelcomeSection({ participants, tournamentStarted }) {
           )}
         </div>
 
-        {/* Identiske picks */}
-        <div className="p-3 bg-gray-50 rounded-lg">
-          <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Like picks</div>
+        {/* Like picks */}
+        <div style={{ padding: 12, background: '#f9fafb', borderRadius: 8 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
+            Like picks
+          </div>
           {identical.length === 0 ? (
-            <p className="text-xs text-gray-500">
-              {count < 2 ? 'For få deltakere' : 'Ingen har valgt nøyaktig samme 4 spillere 👏'}
+            <p style={{ fontSize: 12, color: '#6b7280' }}>
+              {count < 2 ? 'Venter på flere deltakere' : 'Ingen har valgt nøyaktig samme 4 spillere 👏'}
             </p>
           ) : (
-            <div className="space-y-2">
+            <div>
               {identical.map((group, i) => (
-                <div key={i} className="text-xs">
-                  <span className="text-orange-600 font-semibold">Identiske picks:</span>
-                  <span className="text-gray-600 ml-1">{group.join(' & ')}</span>
+                <div key={i} style={{ fontSize: 12, marginBottom: 4 }}>
+                  <span style={{ color: '#d97706', fontWeight: 600 }}>Identiske: </span>
+                  <span style={{ color: '#4b5563' }}>{group.join(' & ')}</span>
                 </div>
               ))}
             </div>
