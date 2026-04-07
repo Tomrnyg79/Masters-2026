@@ -52,7 +52,7 @@ export default function RegisterPage() {
               type="text"
               value={username}
               onChange={e => setUsername(e.target.value)}
-              placeholder="f.eks. Per Ljåstad"
+              placeholder="f.eks. Ola Nordmann"
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600"
               required
               autoFocus

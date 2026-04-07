@@ -27,6 +27,35 @@ function getTodayRound(teeTimes) {
   return null;
 }
 
+// Beregn statistikk om picks
+function calcStats(participants) {
+  const playerCount = {};
+  const pickSets = [];
+
+  for (const p of participants) {
+    const sorted = [...p.picks].sort().join('|');
+    pickSets.push({ name: p.name, key: sorted });
+    for (const pick of p.picks) {
+      playerCount[pick] = (playerCount[pick] || 0) + 1;
+    }
+  }
+
+  // Mest valgte spillere (topp 5)
+  const topPicks = Object.entries(playerCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+
+  // Finn grupper med identiske picks
+  const groups = {};
+  for (const { name, key } of pickSets) {
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(name);
+  }
+  const identical = Object.values(groups).filter(g => g.length > 1);
+
+  return { topPicks, identical };
+}
+
 function RankBadge({ rank }) {
   if (rank === 1) return <span className="text-xl">🥇</span>;
   if (rank === 2) return <span className="text-xl">🥈</span>;
@@ -49,7 +78,6 @@ function PlayerCell({ player, teeTimeRounds, todayRound }) {
   const { name, total, status, r1, r2, r3, r4, toPar, thru, isReserve } = player;
   const todayTT = teeTimeRounds?.find(r => r.round === todayRound);
   const completedRounds = [r1, r2, r3, r4].filter(r => r !== null && r !== undefined);
-
   let rowBg = '';
   if (status === 'MC') rowBg = 'bg-red-50';
   else if (isReserve) rowBg = 'bg-purple-50';
@@ -79,8 +107,7 @@ function PlayerCell({ player, teeTimeRounds, todayRound }) {
       )}
       {todayTT?.teeTime && (
         <div className="text-xs text-green-700 mt-0.5">
-          ⏰ {formatTeeTime(todayTT.teeTime)}
-          {todayTT.startTee === 10 && ' (hull 10)'}
+          ⏰ {formatTeeTime(todayTT.teeTime)}{todayTT.startTee === 10 && ' (hull 10)'}
         </div>
       )}
       {completedRounds.length === 0 && status !== 'MC' && !thru && (
@@ -90,11 +117,91 @@ function PlayerCell({ player, teeTimeRounds, todayRound }) {
   );
 }
 
+function WelcomeSection({ participants, tournamentStarted }) {
+  const { topPicks, identical } = calcStats(participants);
+  const count = participants.length;
+
+  return (
+    <div className="bg-white rounded-xl shadow-sm border border-green-100 p-6 mb-6">
+      {/* Velkomsttekst */}
+      <div className="mb-5">
+        <h2 className="text-xl font-bold text-gray-900 mb-2">
+          Velkommen til årets vakreste eventyr 🌸
+        </h2>
+        <p className="text-gray-600 leading-relaxed">
+          Tro mot tradisjonen samles vi igjen om Masters — golfens mest prestisjefylte turnering,
+          spilt på den ikoniske Augusta National Golf Club i Georgia. Grønne fairways, azaleaer i full
+          blomst, og noen av verdens beste golfspillere. Dette er Masters.
+        </p>
+        <p className="text-gray-600 leading-relaxed mt-2">
+          Stillingslisten her oppdateres <strong>automatisk hvert minutt</strong> så snart turneringen
+          starter torsdag 9. april. Du trenger aldri å refreshe — bare følg med mens dine spillere
+          jobber seg ned gjennom Augusta. Tee-tider, runde-scores og stillingen oppdateres fortløpende.
+        </p>
+      </div>
+
+      {/* Statistikk */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+        {/* Antall registrerte */}
+        <div className="text-center p-3 bg-green-50 rounded-lg">
+          <div className="text-3xl font-bold" style={{ color: AUGUSTA_GREEN }}>{count}</div>
+          <div className="text-sm text-gray-600 mt-0.5">
+            {count === 1 ? 'deltaker registrert' : 'deltakere registrert'}
+          </div>
+          {!tournamentStarted && (
+            <Link href="/register" className="text-xs underline mt-1 block" style={{ color: AUGUSTA_GREEN }}>
+              Registrer deg →
+            </Link>
+          )}
+        </div>
+
+        {/* Mest valgte spillere */}
+        <div className="p-3 bg-gray-50 rounded-lg">
+          <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Mest valgte spillere</div>
+          {topPicks.length === 0 ? (
+            <p className="text-xs text-gray-400">Ingen picks ennå</p>
+          ) : (
+            <ol className="space-y-0.5">
+              {topPicks.map(([name, n], i) => (
+                <li key={name} className="flex items-center justify-between text-sm">
+                  <span className="text-gray-700 truncate">{i + 1}. {name}</span>
+                  <span className="text-xs font-bold ml-2 px-1.5 py-0.5 bg-white rounded border text-gray-600">
+                    {n}x
+                  </span>
+                </li>
+              ))}
+            </ol>
+          )}
+        </div>
+
+        {/* Identiske picks */}
+        <div className="p-3 bg-gray-50 rounded-lg">
+          <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Like picks</div>
+          {identical.length === 0 ? (
+            <p className="text-xs text-gray-500">
+              {count < 2 ? 'For få deltakere' : 'Ingen har valgt nøyaktig samme 4 spillere 👏'}
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {identical.map((group, i) => (
+                <div key={i} className="text-xs">
+                  <span className="text-orange-600 font-semibold">Identiske picks:</span>
+                  <span className="text-gray-600 ml-1">{group.join(' & ')}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const [scoreData, setScoreData] = useState(null);
   const [teeTimeData, setTeeTimeData] = useState({});
   const [participants, setParticipants] = useState([]);
-  const [user, setUser] = useState(undefined); // undefined = laster
+  const [user, setUser] = useState(undefined);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expandedRow, setExpandedRow] = useState(null);
@@ -132,6 +239,7 @@ export default function Home() {
   const apiPlayers = scoreData?.players || [];
   const todayRound = getTodayRound(teeTimeData);
   const tournamentState = scoreData?.tournamentState || 'pre';
+  const tournamentStarted = apiPlayers.length > 0 && tournamentState !== 'pre';
 
   const standings = participants
     .map(p => {
@@ -148,8 +256,6 @@ export default function Home() {
       rank: i === 0 ? 1 : entry.total === arr[i-1].total ? arr[i-1].rank : i + 1,
     }));
 
-  const tournamentStarted = apiPlayers.length > 0 && tournamentState !== 'pre';
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -157,21 +263,19 @@ export default function Home() {
         <div className="max-w-screen-xl mx-auto flex items-center justify-between flex-wrap gap-3">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight">⛳ Masters 2026 Konkurranse</h1>
-            <p className="text-green-200 text-sm mt-0.5">Lavest totalt antall slag vinner · 4 spillere + reserve</p>
+            <p className="text-green-200 text-sm mt-0.5">Augusta National · 9–12. april 2026</p>
           </div>
           <div className="flex items-center gap-2">
             {user === undefined ? null : user ? (
               <>
-                <span className="text-green-200 text-sm hidden sm:block">Hei, {user.username}</span>
+                <span className="text-green-200 text-sm hidden sm:block">Hei, {user.username} 👋</span>
                 <Link href="/mypicks" className="bg-white text-green-800 font-semibold px-3 py-1.5 rounded-lg text-sm hover:bg-green-50 transition">
                   Mine picks
                 </Link>
               </>
             ) : (
               <>
-                <Link href="/login" className="text-green-200 hover:text-white text-sm px-2 py-1">
-                  Logg inn
-                </Link>
+                <Link href="/login" className="text-green-200 hover:text-white text-sm px-2 py-1">Logg inn</Link>
                 <Link href="/register" className="bg-white text-green-800 font-semibold px-3 py-1.5 rounded-lg text-sm hover:bg-green-50 transition">
                   Registrer
                 </Link>
@@ -181,8 +285,12 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="max-w-screen-xl mx-auto px-2 md:px-4 py-4">
-        {/* Status */}
+      <div className="max-w-screen-xl mx-auto px-2 md:px-4 py-5">
+
+        {/* Velkomstseksjon */}
+        <WelcomeSection participants={participants} tournamentStarted={tournamentStarted} />
+
+        {/* Turneringsstatus */}
         <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
           <div className="flex items-center gap-2 flex-wrap">
             {!tournamentStarted && !loading && (
@@ -212,12 +320,12 @@ export default function Home() {
 
         {/* Ingen picks ennå */}
         {standings.length === 0 && !loading && (
-          <div className="text-center py-16 text-gray-400">
-            <p className="text-4xl mb-3">⛳</p>
+          <div className="text-center py-12 text-gray-400 bg-white rounded-xl shadow-sm">
+            <p className="text-3xl mb-3">🏌️</p>
             <p className="text-lg font-medium text-gray-600">Ingen picks registrert ennå</p>
             <p className="text-sm mt-2">
               <Link href="/register" className="font-medium underline" style={{ color: AUGUSTA_GREEN }}>
-                Registrer deg og legg inn dine spillere!
+                Vær den første til å registrere deg!
               </Link>
             </p>
           </div>
@@ -302,7 +410,7 @@ export default function Home() {
           <span>🔴 MC = Misset cut → 79+79 for R3+R4</span>
           <span>🟣 (R) = Reserve brukt</span>
           <span>⏰ = Tee-tid norsk tid</span>
-          <span>↻ Oppdateres hvert minutt</span>
+          <span>↻ Scores oppdateres automatisk hvert minutt</span>
         </div>
       </div>
     </div>
