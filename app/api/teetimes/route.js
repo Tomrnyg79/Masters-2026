@@ -1,15 +1,16 @@
-export const maxDuration = 30; // Vercel: tillat 30 sek
+export const maxDuration = 30;
 
 const EVENT_ID = '401811941';
 
-async function fetchWithTimeout(url, timeoutMs = 4000) {
+function normalizeName(name) {
+  return name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z\s]/g, '').trim();
+}
+
+async function fetchWithTimeout(url, ms = 4000) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const timer = setTimeout(() => controller.abort(), ms);
   try {
-    const res = await fetch(url, {
-      signal: controller.signal,
-      next: { revalidate: 3600 },
-    });
+    const res = await fetch(url, { signal: controller.signal, next: { revalidate: 3600 } });
     return await res.json();
   } catch {
     return null;
@@ -18,9 +19,15 @@ async function fetchWithTimeout(url, timeoutMs = 4000) {
   }
 }
 
-export async function GET() {
+export async function GET(request) {
   try {
-    // Hent alle deltakere
+    const { searchParams } = new URL(request.url);
+    // Valgfri liste med spillernavn vi faktisk trenger tee-tider for
+    const requestedNames = searchParams.get('players')
+      ? searchParams.get('players').split(',').map(n => n.trim()).filter(Boolean)
+      : null;
+
+    // Hent alle konkurrenter fra scoreboard
     const scoreboardData = await fetchWithTimeout(
       'https://site.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard'
     );
@@ -28,18 +35,28 @@ export async function GET() {
     const mastersEvent = scoreboardData?.events?.find(e =>
       e.name?.toLowerCase().includes('master')
     );
-    if (!mastersEvent) {
-      return Response.json({ teeTimes: {} });
-    }
+    if (!mastersEvent) return Response.json({ teeTimes: {} });
 
     const competitors = mastersEvent.competitions?.[0]?.competitors || [];
 
-    // Hent tee-tider i batches (20 om gangen) for å unngå timeout
-    const BATCH_SIZE = 20;
+    // Filtrer til bare relevante spillere hvis angitt
+    const filtered = requestedNames
+      ? competitors.filter(c => {
+          const espnNorm = normalizeName(c.athlete?.displayName || '');
+          return requestedNames.some(req => {
+            const reqNorm = normalizeName(req);
+            const reqLast = reqNorm.split(' ').pop();
+            return espnNorm === reqNorm || espnNorm.includes(reqLast);
+          });
+        })
+      : competitors;
+
+    // Hent tee-tider i batches av 15
+    const BATCH = 15;
     const teeTimes = {};
 
-    for (let i = 0; i < competitors.length; i += BATCH_SIZE) {
-      const batch = competitors.slice(i, i + BATCH_SIZE);
+    for (let i = 0; i < filtered.length; i += BATCH) {
+      const batch = filtered.slice(i, i + BATCH);
       const results = await Promise.all(
         batch.map(async (c) => {
           const data = await fetchWithTimeout(
@@ -56,9 +73,8 @@ export async function GET() {
           };
         })
       );
-
-      for (const player of results) {
-        if (player.name) teeTimes[player.name] = player.rounds;
+      for (const p of results) {
+        if (p.name) teeTimes[p.name] = p.rounds;
       }
     }
 

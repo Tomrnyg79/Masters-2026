@@ -17,13 +17,28 @@ function formatTeeTime(isoString) {
   });
 }
 
-function getTodayRound(teeTimes) {
-  const today = new Date().toISOString().split('T')[0];
+// Returner aktiv runde (i dag) eller neste kommende runde
+function getActiveRound(teeTimes) {
+  const now = new Date();
+  const today = now.toISOString().split('T')[0];
+  // Sjekk om noen runde spilles i dag
   for (const playerRounds of Object.values(teeTimes)) {
     for (const r of playerRounds) {
-      if (r.teeTime && r.teeTime.startsWith(today)) return r.round;
+      if (r.teeTime && r.teeTime.startsWith(today)) return { round: r.round, label: 'i dag' };
     }
   }
+  // Finn neste kommende runde
+  let next = null;
+  for (const playerRounds of Object.values(teeTimes)) {
+    for (const r of playerRounds) {
+      if (!r.teeTime) continue;
+      const t = new Date(r.teeTime);
+      if (t > now && (!next || t < new Date(next.teeTime))) {
+        next = r;
+      }
+    }
+  }
+  if (next) return { round: next.round, label: 'neste runde' };
   return null;
 }
 
@@ -219,29 +234,38 @@ export default function Home() {
     const [scores, picks, me] = await Promise.all([
       scoresRes.json(), picksRes.json(), meRes.json(),
     ]);
+    const loadedParticipants = picks.participants || [];
     setScoreData(scores);
-    setParticipants(picks.participants || []);
+    setParticipants(loadedParticipants);
     setUser(me.user || null);
     setLastUpdated(new Date());
     setLoading(false);
+    return loadedParticipants;
   }, []);
 
-  const fetchTeeTimes = useCallback(async () => {
-    const res = await fetch('/api/teetimes');
+  const fetchTeeTimes = useCallback(async (currentParticipants) => {
+    const uniquePlayers = [...new Set(
+      (currentParticipants || []).flatMap(p => [...(p.picks || []), p.reserve].filter(Boolean))
+    )];
+    const query = uniquePlayers.length > 0
+      ? `?players=${encodeURIComponent(uniquePlayers.join(','))}`
+      : '';
+    const res = await fetch(`/api/teetimes${query}`);
     const data = await res.json();
     setTeeTimeData(data.teeTimes || {});
   }, []);
 
+
   useEffect(() => {
-    fetchAll();
-    fetchTeeTimes();
+    fetchAll().then(loaded => fetchTeeTimes(loaded));
     const s = setInterval(fetchAll, SCORE_REFRESH);
-    const t = setInterval(fetchTeeTimes, TEETIME_REFRESH);
+    const t = setInterval(() => fetchTeeTimes(participants), TEETIME_REFRESH);
     return () => { clearInterval(s); clearInterval(t); };
   }, [fetchAll, fetchTeeTimes]);
 
   const apiPlayers = scoreData?.players || [];
-  const todayRound = getTodayRound(teeTimeData);
+  const activeRoundInfo = getActiveRound(teeTimeData);
+  const todayRound = activeRoundInfo?.round ?? null;
   const tournamentState = scoreData?.tournamentState || 'pre';
   const tournamentStarted = apiPlayers.length > 0 && tournamentState !== 'pre';
 
@@ -307,9 +331,9 @@ export default function Home() {
                 🟢 {scoreData?.eventName} · Runde {scoreData?.currentRound}
               </span>
             )}
-            {todayRound && (
+            {activeRoundInfo && (
               <span className="px-3 py-1 rounded-full text-sm bg-blue-50 text-blue-700">
-                Runde {todayRound} spilles i dag
+                Runde {activeRoundInfo.round} {activeRoundInfo.label}
               </span>
             )}
           </div>
