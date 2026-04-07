@@ -1,11 +1,11 @@
-// Server-side API route - henter Masters-resultater fra ESPN
-// Kjøres server-side så CORS ikke er et problem
+// Henter live Masters-scores fra ESPN
+// Oppdateres hvert 60. sekund under turneringen
 
 export async function GET() {
   try {
     const res = await fetch(
       'https://site.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard',
-      { next: { revalidate: 120 } } // cache 2 minutter
+      { next: { revalidate: 60 } }
     );
 
     if (!res.ok) {
@@ -14,7 +14,6 @@ export async function GET() {
 
     const data = await res.json();
 
-    // Finn Masters-turneringen
     const mastersEvent = data.events?.find(e =>
       e.name?.toLowerCase().includes('master')
     );
@@ -24,36 +23,57 @@ export async function GET() {
         players: [],
         eventName: null,
         tournamentStatus: 'not_started',
-        availableEvents: data.events?.map(e => e.name) || [],
       });
     }
 
     const competitors = mastersEvent.competitions?.[0]?.competitors || [];
-    const roundsCompleted = mastersEvent.competitions?.[0]?.status?.period || 0;
+    const currentRound = mastersEvent.competitions?.[0]?.status?.period || 0;
+    const tournamentState = mastersEvent.status?.type?.state || 'pre';
 
     const players = competitors.map(c => {
       const linescores = c.linescores || [];
       const statusName = c.status?.type?.name || '';
+      const statusDetail = c.status?.type?.shortDetail || '';
 
+      // Status: MC, WD eller aktiv
       let status = 'active';
       if (statusName.includes('CUT') || statusName === 'STATUS_CUT') status = 'MC';
       if (statusName.includes('WITHDRAWN') || statusName === 'STATUS_WITHDRAWN') status = 'WD';
 
+      // Thru-info: "Thru 14", "F", "1*" osv
+      let thru = null;
+      if (statusDetail && statusDetail !== '') {
+        thru = statusDetail;
+      }
+
+      // Runde-scores
+      const r1 = linescores[0]?.value ?? null;
+      const r2 = linescores[1]?.value ?? null;
+      const r3 = linescores[2]?.value ?? null;
+      const r4 = linescores[3]?.value ?? null;
+
+      // Score til par (f.eks. "-12", "+3", "E")
+      const toPar = c.score?.displayValue ?? 'E';
+
       return {
         name: c.athlete?.displayName || '',
-        r1: linescores[0]?.value || null,
-        r2: linescores[1]?.value || null,
-        r3: linescores[2]?.value || null,
-        r4: linescores[3]?.value || null,
-        toPar: c.score?.displayValue || 'E',
+        id: c.id,
+        r1,
+        r2,
+        r3,
+        r4,
+        toPar,
+        thru,        // "Thru 9", "F", null
         status,
+        currentRound,
       };
     });
 
     return Response.json({
       players,
       eventName: mastersEvent.name,
-      roundsCompleted,
+      currentRound,
+      tournamentState,   // "pre", "in", "post"
       tournamentStatus: mastersEvent.status?.type?.name || 'unknown',
     });
   } catch (err) {
