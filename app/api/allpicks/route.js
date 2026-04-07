@@ -3,6 +3,7 @@ import { supabase } from '../../../lib/supabase';
 
 // Hent alle deltakere og picks for stillingslisten (public)
 export async function GET() {
+  const { data: picksOnly, error: e1 } = await supabase.from('picks').select('user_id');
   const { data, error } = await supabase
     .from('picks')
     .select(`
@@ -20,7 +21,7 @@ export async function GET() {
     reserve: row.reserve || null,
   }));
 
-  return new Response(JSON.stringify({ participants, _debug_raw: data?.length, _debug_key_prefix: process.env.SUPABASE_SERVICE_ROLE_KEY?.slice(0, 20) }), {
+  return new Response(JSON.stringify({ participants, _debug_raw: data?.length, _debug_picks_only: picksOnly?.length, _debug_error: e1?.message }), {
     headers: {
       'Content-Type': 'application/json',
       'Cache-Control': 'no-store, no-cache, must-revalidate',
