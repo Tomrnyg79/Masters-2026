@@ -20,7 +20,7 @@ export async function GET() {
     reserve: row.reserve || null,
   }));
 
-  return new Response(JSON.stringify({ participants }), {
+  return new Response(JSON.stringify({ participants, _debug_raw: data?.length }), {
     headers: {
       'Content-Type': 'application/json',
       'Cache-Control': 'no-store, no-cache, must-revalidate',
