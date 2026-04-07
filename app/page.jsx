@@ -294,8 +294,8 @@ export default function Home() {
             <p className="text-green-200 text-sm mt-0.5">Augusta National · 9–12. april 2026</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap justify-end">
-            <Link href="/regler" className="text-green-200 hover:text-white text-sm px-2 py-1 hidden sm:block">Regler</Link>
-            <Link href="/premier" className="text-green-200 hover:text-white text-sm px-2 py-1 hidden sm:block">Premier</Link>
+            <Link href="/regler" className="text-green-200 hover:text-white text-sm px-2 py-1">Regler</Link>
+            <Link href="/premier" className="text-green-200 hover:text-white text-sm px-2 py-1">Premier</Link>
             {user === undefined ? null : user ? (
               <>
                 <span className="text-green-200 text-sm hidden md:block">Hei, {user.username} 👋</span>
