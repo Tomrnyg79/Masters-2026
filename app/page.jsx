@@ -234,9 +234,9 @@ export default function Home() {
 
   const fetchAll = useCallback(async () => {
     const [scoresRes, picksRes, meRes] = await Promise.all([
-      fetch('/api/scores'),
-      fetch('/api/allpicks'),
-      fetch('/api/auth/me'),
+      fetch('/api/scores', { cache: 'no-store' }),
+      fetch('/api/allpicks', { cache: 'no-store' }),
+      fetch('/api/auth/me', { cache: 'no-store' }),
     ]);
     const [scores, picks, me] = await Promise.all([
       scoresRes.json(), picksRes.json(), meRes.json(),
