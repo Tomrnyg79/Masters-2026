@@ -87,24 +87,6 @@ export default function PremierPage() {
           </div>
         </div>
 
-        {/* Simulator */}
-        <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', padding: 24 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 8 }}>📊 Hva hvis alle 35 deltar?</h2>
-          <p style={{ color: '#6b7280', fontSize: 14, marginBottom: 16 }}>Estimat basert på 35 deltakere × 200 kr = 7 000 kr</p>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            {PRIZES.map(prize => (
-              <div key={prize.place} style={{
-                flex: '1 1 140px', textAlign: 'center', padding: 16, borderRadius: 10, background: '#f9fafb'
-              }}>
-                <div style={{ fontSize: 24 }}>{prize.medal}</div>
-                <div style={{ fontWeight: 700, fontSize: 22, color: prize.color, marginTop: 4 }}>
-                  {(7000 * prize.pct).toLocaleString('nb-NO')} kr
-                </div>
-                <div style={{ fontSize: 12, color: '#9ca3af' }}>{prize.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
 
         <div style={{ textAlign: 'center', paddingTop: 4 }}>
           <Link href="/regler"
