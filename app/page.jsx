@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { calculateParticipantScore } from '../lib/scoring';
+import { calculateParticipantScore, formatToPar } from '../lib/scoring';
 import './globals.css';
 
 const AUGUSTA_GREEN = '#006747';
@@ -90,9 +90,9 @@ function ToParBadge({ toPar }) {
 
 function PlayerCell({ player, teeTimeRounds, todayRound }) {
   if (!player) return <td className="px-2 py-2 text-gray-300 text-sm">-</td>;
-  const { name, total, status, r1, r2, r3, r4, toPar, thru, isReserve } = player;
+  const { name, total, toParNum, status, r1, r2, r3, r4, thru, isReserve } = player;
   const todayTT = teeTimeRounds?.find(r => r.round === todayRound);
-  const completedRounds = [r1, r2, r3, r4].filter(r => r !== null && r !== undefined);
+  const completedRounds = [r1, r2, r3, r4].filter(r => r !== null && r !== undefined && r !== 79);
   let rowBg = '';
   if (status === 'MC') rowBg = 'bg-red-50';
   else if (isReserve) rowBg = 'bg-purple-50';
@@ -103,30 +103,43 @@ function PlayerCell({ player, teeTimeRounds, todayRound }) {
         {isReserve && <span className="text-purple-500 text-xs font-bold">(R)</span>}
         <span className="font-medium text-gray-800 truncate max-w-[130px]" title={name}>{name}</span>
       </div>
-      {status !== 'MC' && (toPar || thru) && (
+
+      {/* Score til par + thru */}
+      {status !== 'MC' && status !== 'not_started' && toParNum !== undefined && (
         <div className="flex items-center gap-1 mb-0.5">
-          {toPar && <ToParBadge toPar={toPar} />}
+          <ToParBadge toPar={formatToPar(toParNum)} />
           {thru && <span className="text-xs text-gray-500">{thru}</span>}
         </div>
       )}
+
+      {/* Runde-scores */}
       {completedRounds.length > 0 && (
         <div className="flex gap-1 mb-0.5 flex-wrap">
           {[r1, r2, r3, r4].map((r, i) => r !== null && r !== undefined ? (
-            <span key={i} className="text-xs bg-gray-100 rounded px-1 text-gray-700 font-mono">R{i+1}:{r}</span>
+            <span key={i} className="text-xs bg-gray-100 rounded px-1 text-gray-700 font-mono">
+              R{i+1}:{r}
+            </span>
           ) : null)}
-          {status !== 'MC' && <span className="text-xs font-bold text-gray-800 ml-1">={total}</span>}
         </div>
       )}
+
+      {/* MC */}
       {status === 'MC' && (
-        <div className="text-xs text-red-600 font-semibold">MC · {(r1||0)+(r2||0)}+79+79={total}</div>
+        <div className="text-xs text-red-600 font-semibold">
+          MC · R1:{r1} R2:{r2} +79+79 = {total} slag
+        </div>
       )}
+
+      {/* Tee-tid */}
       {todayTT?.teeTime && (
         <div className="text-xs text-green-700 mt-0.5">
           ⏰ {formatTeeTime(todayTT.teeTime)}{todayTT.startTee === 10 && ' (hull 10)'}
         </div>
       )}
-      {completedRounds.length === 0 && status !== 'MC' && !thru && (
-        <div className="text-xs text-gray-400">Ikke startet</div>
+
+      {/* Ikke startet */}
+      {status === 'not_started' && (
+        <div className="text-xs text-gray-400">Ikke startet (par 72)</div>
       )}
     </td>
   );
@@ -386,9 +399,12 @@ export default function Home() {
                         <PlayerCell key={j} player={pd} teeTimeRounds={pd.teeTimeRounds} todayRound={todayRound} />
                       ))}
                       <td className="px-3 py-2 text-right">
-                        <span className={`text-base font-bold ${entry.rank === 1 ? 'text-yellow-600' : 'text-gray-800'}`}>
-                          {entry.total > 0 ? entry.total : '-'}
-                        </span>
+                        <div className={`text-base font-bold ${entry.rank === 1 ? 'text-yellow-600' : 'text-gray-800'}`}>
+                          {entry.total} slag
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {formatToPar(entry.total - 1152)}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -408,7 +424,7 @@ export default function Home() {
                       <span className="font-bold text-gray-900">{entry.name}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-lg font-bold">{entry.total > 0 ? entry.total : '-'}</span>
+                      <span className="text-lg font-bold">{entry.total} slag</span>
                       <span className="text-gray-400 text-sm">{expandedRow === entry.name ? '▲' : '▼'}</span>
                     </div>
                   </button>
