@@ -335,10 +335,7 @@ export default function Home() {
 
       <div className="max-w-screen-xl mx-auto px-4 py-5">
 
-        {tournamentStarted
-          ? <MastersTop10 apiPlayers={apiPlayers} />
-          : <WelcomeSection participants={participants} tournamentStarted={tournamentStarted} />
-        }
+        <MastersTop10 apiPlayers={apiPlayers} />
 
         {/* Status bar */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
