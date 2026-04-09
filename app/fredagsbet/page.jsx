@@ -144,6 +144,9 @@ export default function FredagsbetPage() {
           <div style={{ marginTop: 8, opacity: 0.85, fontSize: 15 }}>
             {bets.length} deltaker{bets.length !== 1 ? 'e' : ''} × 25 kr
           </div>
+          <div style={{ marginTop: 12, background: 'rgba(255,255,255,0.15)', borderRadius: 8, padding: '8px 14px', display: 'inline-block', fontSize: 14 }}>
+            🏆 Vinneren tar alt
+          </div>
         </div>
 
         {/* Regler-boks */}
