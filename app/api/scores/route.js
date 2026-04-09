@@ -1,11 +1,10 @@
-// Henter live Masters-scores fra ESPN
-// Oppdateres hvert 60. sekund under turneringen
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
     const res = await fetch(
       'https://site.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard',
-      { next: { revalidate: 60 } }
+      { cache: 'no-store' }
     );
 
     if (!res.ok) {
@@ -69,12 +68,14 @@ export async function GET() {
       };
     });
 
-    return Response.json({
+    return new Response(JSON.stringify({
       players,
       eventName: mastersEvent.name,
       currentRound,
-      tournamentState,   // "pre", "in", "post"
+      tournamentState,
       tournamentStatus: mastersEvent.status?.type?.name || 'unknown',
+    }), {
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store, no-cache, must-revalidate' },
     });
   } catch (err) {
     return Response.json({ players: [], error: err.message }, { status: 500 });
