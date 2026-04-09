@@ -12,6 +12,7 @@ export default function FredagsbetPage() {
   const [players, setPlayers] = useState([]);
   const [bets, setBets] = useState([]);
   const [scores, setScores] = useState({});
+  const [currentRound, setCurrentRound] = useState(1);
   const [myBet, setMyBet] = useState({ player: '', tiebreaker: '' });
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -37,6 +38,7 @@ export default function FredagsbetPage() {
         .filter(p => p.status !== 'WD' && p.status !== 'MC')
         .map(p => p.name).sort();
       setPlayers(playerList);
+      setCurrentRound(scoresData.currentRound || 1);
 
       // Bygg score-map for R2
       const scoreMap = {};
@@ -83,11 +85,10 @@ export default function FredagsbetPage() {
   }
 
   function getR2ToPar(playerName) {
+    if (currentRound < 2) return null; // R2 ikke startet ennå
     const p = scores[playerName];
-    if (!p) return null;
-    // Beregn R2 to-par fra total toPar minus R1
+    if (!p || p.r1 == null) return null;
     const totalToParNum = p.toPar === 'E' ? 0 : parseInt(p.toPar) || 0;
-    if (p.r1 == null) return totalToParNum;
     return totalToParNum - (p.r1 - 72);
   }
 
