@@ -135,6 +135,17 @@ export default function FredagsbetPage() {
 
       <div style={{ maxWidth: 680, margin: '0 auto', padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: 16 }}>
 
+        {/* Pott-oversikt */}
+        <div style={{ background: AUGUSTA_GREEN, borderRadius: 12, padding: '20px 16px', color: '#fff', textAlign: 'center' }}>
+          <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 2, opacity: 0.8, marginBottom: 8 }}>Premiepott</div>
+          <div style={{ fontSize: 'clamp(32px, 10vw, 52px)', fontWeight: 800, lineHeight: 1, letterSpacing: -1 }}>
+            {bets.length * 25} kr
+          </div>
+          <div style={{ marginTop: 8, opacity: 0.85, fontSize: 15 }}>
+            {bets.length} deltaker{bets.length !== 1 ? 'e' : ''} × 25 kr
+          </div>
+        </div>
+
         {/* Regler-boks */}
         <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', padding: '16px' }}>
           <h2 style={{ fontSize: 16, fontWeight: 700, color: '#111827', marginBottom: 10 }}>📋 Slik fungerer fredagsbetet</h2>
