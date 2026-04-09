@@ -144,6 +144,8 @@ function PlayerCell({ player, teeTimeRounds, todayRound, currentRound }) {
   );
 }
 
+const NORWEGIANS = ['Viktor Hovland', 'Kristoffer Reitan'];
+
 function MastersTop10({ apiPlayers }) {
   if (!apiPlayers || apiPlayers.length === 0) return null;
 
@@ -153,8 +155,20 @@ function MastersTop10({ apiPlayers }) {
       const aNum = a.toPar === 'E' ? 0 : parseInt(a.toPar) || 0;
       const bNum = b.toPar === 'E' ? 0 : parseInt(b.toPar) || 0;
       return aNum - bNum;
-    })
-    .slice(0, 10);
+    });
+
+  const top10 = sorted.slice(0, 10);
+  const top10Names = new Set(top10.map(p => p.name));
+
+  // Legg til nordmenn som ikke allerede er i topp 10
+  const extraNorwegians = sorted
+    .map((p, i) => ({ ...p, position: i + 1 }))
+    .filter(p => NORWEGIANS.includes(p.name) && !top10Names.has(p.name));
+
+  const display = [
+    ...top10.map((p, i) => ({ ...p, position: i + 1 })),
+    ...extraNorwegians,
+  ];
 
   return (
     <div style={{
@@ -167,25 +181,27 @@ function MastersTop10({ apiPlayers }) {
         🏆 Topp 10 — The Masters
       </h2>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {sorted.map((p, i) => {
+        {display.map((p, i) => {
           const toParNum = p.toPar === 'E' ? 0 : parseInt(p.toPar) || 0;
           const color = toParNum < 0 ? '#b91c1c' : toParNum > 0 ? '#1d4ed8' : '#4b5563';
           const bg = toParNum < 0 ? '#fee2e2' : toParNum > 0 ? '#dbeafe' : '#f3f4f6';
+          const isNorwegian = NORWEGIANS.includes(p.name);
+          const isExtra = i >= 10;
           return (
             <div key={p.id || p.name} style={{
               display: 'flex', alignItems: 'center', gap: 10,
               padding: '7px 10px', borderRadius: 8,
-              background: i === 0 ? '#fffbeb' : '#f9fafb',
-              border: i === 0 ? '1px solid #fde68a' : '1px solid #f3f4f6',
+              background: i === 0 ? '#fffbeb' : isExtra ? '#f0f9ff' : '#f9fafb',
+              border: i === 0 ? '1px solid #fde68a' : isExtra ? '1px solid #bae6fd' : '1px solid #f3f4f6',
             }}>
-              <span style={{ fontSize: 13, fontWeight: 700, color: '#6b7280', width: 20, textAlign: 'center', flexShrink: 0 }}>
-                {i + 1}
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#6b7280', width: 24, textAlign: 'center', flexShrink: 0 }}>
+                {p.position}
               </span>
               <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: '#111827', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {p.name}
+                {p.name}{isNorwegian ? ' 🇳🇴' : ''}
               </span>
               <span style={{ fontSize: 13, fontWeight: 700, padding: '2px 8px', borderRadius: 4, background: bg, color, flexShrink: 0 }}>
-                {p.toPar === 'E' || p.toPar === '0' ? 'E' : toParNum > 0 ? `+${toParNum}` : p.toPar}
+                {toParNum === 0 ? 'E' : toParNum > 0 ? `+${toParNum}` : String(toParNum)}
               </span>
               {p.thru && (
                 <span style={{ fontSize: 12, color: '#9ca3af', flexShrink: 0, minWidth: 36, textAlign: 'right' }}>
