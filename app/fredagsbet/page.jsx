@@ -224,8 +224,15 @@ export default function FredagsbetPage() {
                 {success && <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '10px 14px', color: '#15803d', fontSize: 14, fontWeight: 600 }}>✓ Tips lagret!</div>}
 
                 {!locked && (
-                  <button type="submit" disabled={saving} style={{ width: '100%', background: saving ? '#6b7280' : AUGUSTA_GREEN, color: '#fff', border: 'none', borderRadius: 12, height: 52, fontSize: 16, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer' }}>
-                    {saving ? 'Melder på...' : '🎯 Meld meg på'}
+                  <button type="submit" disabled={saving || !!bets.find(b => b.name === user?.username)} style={{
+                    width: '100%',
+                    background: saving ? '#6b7280' : bets.find(b => b.name === user?.username) ? '#d1fae5' : AUGUSTA_GREEN,
+                    color: bets.find(b => b.name === user?.username) ? '#15803d' : '#fff',
+                    border: bets.find(b => b.name === user?.username) ? '2px solid #6ee7b7' : 'none',
+                    borderRadius: 12, height: 52, fontSize: 16, fontWeight: 700,
+                    cursor: (saving || bets.find(b => b.name === user?.username)) ? 'not-allowed' : 'pointer',
+                  }}>
+                    {saving ? 'Melder på...' : bets.find(b => b.name === user?.username) ? '✓ Du er påmeldt' : '🎯 Meld meg på'}
                   </button>
                 )}
               </form>
