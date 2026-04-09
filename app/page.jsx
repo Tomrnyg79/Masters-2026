@@ -533,8 +533,10 @@ export default function Home() {
                                 {pd.name}
                               </div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                                {pd.toPar && <ToParBadge toPar={pd.toPar} />}
-                                {pd.thru && <span style={{ fontSize: 12, color: '#6b7280' }}>{pd.thru}</span>}
+                                {pd.status !== 'not_started' && pd.toParNum !== undefined && (
+                                  <ToParBadge toPar={formatToPar(pd.toParNum)} />
+                                )}
+                                {pd.thru && <span style={{ fontSize: 12, color: '#6b7280' }}>thru {pd.thru}</span>}
                               </div>
                               {pd.status === 'MC' && (
                                 <div style={{ fontSize: 12, color: '#dc2626', fontWeight: 600, marginTop: 4 }}>
