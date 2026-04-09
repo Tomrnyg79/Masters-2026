@@ -31,38 +31,43 @@ export async function GET() {
 
     const players = competitors.map(c => {
       const linescores = c.linescores || [];
-      const statusName = c.status?.type?.name || '';
-      const statusDetail = c.status?.type?.shortDetail || '';
 
       // Status: MC, WD eller aktiv
       let status = 'active';
-      if (statusName.includes('CUT') || statusName === 'STATUS_CUT') status = 'MC';
-      if (statusName.includes('WITHDRAWN') || statusName === 'STATUS_WITHDRAWN') status = 'WD';
+      const statusStr = JSON.stringify(c.status || '').toLowerCase();
+      if (statusStr.includes('cut')) status = 'MC';
+      if (statusStr.includes('withdrawn') || statusStr.includes('wd')) status = 'WD';
 
-      // Thru-info: "Thru 14", "F", "1*" osv
-      let thru = null;
-      if (statusDetail && statusDetail !== '') {
-        thru = statusDetail;
+      // toPar: ESPN returnerer et tall (f.eks. -3, 0, 2) eller null
+      const toParNum = c.score;
+      let toPar = 'E';
+      if (toParNum !== null && toParNum !== undefined && toParNum !== 'E') {
+        const n = parseInt(toParNum);
+        if (!isNaN(n)) toPar = n === 0 ? 'E' : n > 0 ? `+${n}` : String(n);
       }
 
-      // Runde-scores
-      const r1 = linescores[0]?.value ?? null;
-      const r2 = linescores[1]?.value ?? null;
-      const r3 = linescores[2]?.value ?? null;
-      const r4 = linescores[3]?.value ?? null;
+      // Thru: antall hull spilt i inneværende runde
+      const currentRoundLS = linescores.find(ls => ls.period === currentRound);
+      const holesPlayed = currentRoundLS?.linescores?.length ?? 0;
+      const thru = holesPlayed === 18 ? 'F' : holesPlayed > 0 ? String(holesPlayed) : null;
 
-      // Score til par (f.eks. "-12", "+3", "E")
-      const toPar = c.score?.displayValue ?? 'E';
+      // Runde-scores: value er slag i den runden (komplett = faktisk slag, f.eks. 69)
+      const getRoundScore = (round) => {
+        const ls = linescores.find(l => l.period === round);
+        if (!ls) return null;
+        const holes = ls.linescores?.length ?? 0;
+        return holes === 18 ? ls.value : null; // Kun vis hvis runden er ferdig
+      };
 
       return {
         name: c.athlete?.displayName || '',
         id: c.id,
-        r1,
-        r2,
-        r3,
-        r4,
+        r1: getRoundScore(1),
+        r2: getRoundScore(2),
+        r3: getRoundScore(3),
+        r4: getRoundScore(4),
         toPar,
-        thru,        // "Thru 9", "F", null
+        thru,
         status,
         currentRound,
       };
