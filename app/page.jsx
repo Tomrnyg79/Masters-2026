@@ -77,6 +77,14 @@ function RankBadge({ rank }) {
   );
 }
 
+function getTodayToPar(pd, currentRound) {
+  if (pd.toParNum === undefined || pd.toParNum === null) return null;
+  const completed = [pd.r1, pd.r2, pd.r3, pd.r4]
+    .slice(0, (currentRound || 1) - 1)
+    .reduce((sum, r) => r != null ? sum + (r - 72) : sum, 0);
+  return pd.toParNum - completed;
+}
+
 function ToParBadge({ toPar }) {
   if (!toPar || toPar === 'E' || toPar === '0') {
     return <span style={{ padding: '2px 6px', borderRadius: 4, fontSize: 12, fontWeight: 700, background: '#f3f4f6', color: '#4b5563' }}>E</span>;
@@ -87,48 +95,50 @@ function ToParBadge({ toPar }) {
   return <span style={{ padding: '2px 6px', borderRadius: 4, fontSize: 12, fontWeight: 700, background: '#dbeafe', color: '#1d4ed8' }}>+{num}</span>;
 }
 
-function PlayerCell({ player, teeTimeRounds, todayRound }) {
+function PlayerCell({ player, teeTimeRounds, todayRound, currentRound }) {
   if (!player) return <td className="px-2 py-2 text-gray-300 text-sm">-</td>;
   const { name, total, toParNum, status, r1, r2, r3, r4, thru, isReserve } = player;
   const todayTT = teeTimeRounds?.find(r => r.round === todayRound);
-  const completedRounds = [r1, r2, r3, r4].filter(r => r !== null && r !== undefined && r !== 79);
+  const todayToPar = getTodayToPar(player, currentRound);
+  const completedRounds = [r1, r2, r3, r4].filter(r => r !== null && r !== undefined);
   let rowBg = '';
   if (status === 'MC') rowBg = 'bg-red-50';
   else if (isReserve) rowBg = 'bg-purple-50';
 
   return (
     <td className={`px-2 py-2 text-sm align-top ${rowBg} border-r border-gray-100`}>
-      <div className="flex items-center gap-1 mb-0.5">
+      <div className="flex items-center gap-1 mb-1">
         {isReserve && <span className="text-purple-500 text-xs font-bold">(R)</span>}
         <span className="font-medium text-gray-800 truncate max-w-[130px]" title={name}>{name}</span>
       </div>
-      {status !== 'MC' && status !== 'not_started' && toParNum !== undefined && (
+      {status === 'not_started' && (
+        <div className="text-xs text-gray-400">Ikke startet</div>
+      )}
+      {status === 'MC' && (
+        <div className="text-xs text-red-600 font-semibold">🔴 MC · R1:{r1} R2:{r2}</div>
+      )}
+      {status === 'active' && todayToPar !== null && (
         <div className="flex items-center gap-1 mb-0.5">
+          <span className="text-xs text-gray-500 font-medium">I dag:</span>
+          <ToParBadge toPar={formatToPar(todayToPar)} />
+          {thru && <span className="text-xs text-gray-400">({thru === 'F' ? 'F' : `H${thru}`})</span>}
+        </div>
+      )}
+      {status === 'active' && toParNum !== undefined && (
+        <div className="flex items-center gap-1 mb-0.5">
+          <span className="text-xs text-gray-500 font-medium">Tot:</span>
           <ToParBadge toPar={formatToPar(toParNum)} />
-          {thru && <span className="text-xs text-gray-500">{thru}</span>}
         </div>
       )}
       {completedRounds.length > 0 && (
-        <div className="flex gap-1 mb-0.5 flex-wrap">
+        <div className="flex gap-1 flex-wrap mt-0.5">
           {[r1, r2, r3, r4].map((r, i) => r !== null && r !== undefined ? (
-            <span key={i} className="text-xs bg-gray-100 rounded px-1 text-gray-700 font-mono">
-              R{i+1}:{r}
-            </span>
+            <span key={i} className="text-xs bg-gray-100 rounded px-1 text-gray-600 font-mono">R{i+1}:{r}</span>
           ) : null)}
         </div>
       )}
-      {status === 'MC' && (
-        <div className="text-xs text-red-600 font-semibold">
-          MC · R1:{r1} R2:{r2} +79+79 = {total} slag
-        </div>
-      )}
       {todayTT?.teeTime && (
-        <div className="text-xs text-green-700 mt-0.5">
-          ⏰ {formatTeeTime(todayTT.teeTime)}{todayTT.startTee === 10 && ' (hull 10)'}
-        </div>
-      )}
-      {status === 'not_started' && (
-        <div className="text-xs text-gray-400">Ikke startet (par 72)</div>
+        <div className="text-xs text-green-700 mt-0.5">⏰ {formatTeeTime(todayTT.teeTime)}</div>
       )}
     </td>
   );
@@ -442,7 +452,7 @@ export default function Home() {
                       <td className="px-3 py-2 text-center"><RankBadge rank={entry.rank} /></td>
                       <td className="px-3 py-2 font-semibold text-gray-900">{entry.name}</td>
                       {entry.playerDetails.map((pd, j) => (
-                        <PlayerCell key={j} player={pd} teeTimeRounds={pd.teeTimeRounds} todayRound={todayRound} />
+                        <PlayerCell key={j} player={pd} teeTimeRounds={pd.teeTimeRounds} todayRound={todayRound} currentRound={scoreData?.currentRound} />
                       ))}
                       <td className="px-3 py-2 text-right">
                         <div className={`text-base font-bold ${entry.rank === 1 ? 'text-yellow-600' : 'text-gray-800'}`}>
@@ -518,6 +528,7 @@ export default function Home() {
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                         {entry.playerDetails.map((pd, j) => {
                           const todayTT = pd.teeTimeRounds?.find(r => r.round === todayRound);
+                          const todayToPar = getTodayToPar(pd, scoreData?.currentRound);
                           return (
                             <div
                               key={j}
@@ -528,34 +539,56 @@ export default function Home() {
                                 border: pd.status === 'MC' ? '1px solid #fecaca' : pd.isReserve ? '1px solid #e9d5ff' : '1px solid #f3f4f6',
                               }}
                             >
-                              <div style={{ fontWeight: 600, fontSize: 14, color: '#111827', marginBottom: 4 }}>
+                              {/* Navn */}
+                              <div style={{ fontWeight: 700, fontSize: 14, color: '#111827', marginBottom: 6 }}>
                                 {pd.isReserve && <span style={{ color: '#7c3aed', fontSize: 11, fontWeight: 700, marginRight: 4 }}>(R)</span>}
                                 {pd.name}
                               </div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                                {pd.status !== 'not_started' && pd.toParNum !== undefined && (
-                                  <ToParBadge toPar={formatToPar(pd.toParNum)} />
-                                )}
-                                {pd.thru && <span style={{ fontSize: 12, color: '#6b7280' }}>thru {pd.thru}</span>}
-                              </div>
-                              {pd.status === 'MC' && (
-                                <div style={{ fontSize: 12, color: '#dc2626', fontWeight: 600, marginTop: 4 }}>
-                                  MC · {pd.total} slag
-                                </div>
-                              )}
-                              {pd.r1 !== null && pd.r1 !== undefined && (
-                                <div style={{ fontSize: 11, color: '#6b7280', marginTop: 4, fontFamily: 'monospace' }}>
-                                  {[pd.r1, pd.r2, pd.r3, pd.r4].filter(r => r != null).map((r, i) => `R${i+1}:${r}`).join(' ')}
-                                </div>
-                              )}
-                              {todayTT?.teeTime && (
-                                <div style={{ fontSize: 12, color: '#15803d', marginTop: 4 }}>
-                                  ⏰ {formatTeeTime(todayTT.teeTime)}
-                                  {todayTT.startTee === 10 && ' (hull 10)'}
-                                </div>
-                              )}
+
                               {pd.status === 'not_started' && (
-                                <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 4 }}>Ikke startet</div>
+                                <div style={{ fontSize: 12, color: '#9ca3af' }}>Ikke startet</div>
+                              )}
+
+                              {pd.status === 'MC' && (
+                                <div style={{ fontSize: 12, color: '#dc2626', fontWeight: 600 }}>
+                                  🔴 MC · R1:{pd.r1} R2:{pd.r2}
+                                </div>
+                              )}
+
+                              {pd.status === 'active' && (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                  {/* I dag */}
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                    <span style={{ fontSize: 12, color: '#6b7280', width: 48 }}>I dag:</span>
+                                    <ToParBadge toPar={formatToPar(todayToPar)} />
+                                    {pd.thru && (
+                                      <span style={{ fontSize: 12, color: '#6b7280' }}>
+                                        {pd.thru === 'F' ? 'Ferdig' : `hull ${pd.thru}/18`}
+                                      </span>
+                                    )}
+                                  </div>
+                                  {/* Totalt */}
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                    <span style={{ fontSize: 12, color: '#6b7280', width: 48 }}>Totalt:</span>
+                                    <ToParBadge toPar={formatToPar(pd.toParNum)} />
+                                  </div>
+                                  {/* Runde-scores */}
+                                  {[pd.r1, pd.r2, pd.r3, pd.r4].some(r => r != null) && (
+                                    <div style={{ display: 'flex', gap: 4, marginTop: 2, flexWrap: 'wrap' }}>
+                                      {[pd.r1, pd.r2, pd.r3, pd.r4].map((r, i) => r != null ? (
+                                        <span key={i} style={{ fontSize: 11, background: '#e5e7eb', borderRadius: 4, padding: '1px 5px', fontFamily: 'monospace', color: '#374151' }}>
+                                          R{i+1}:{r}
+                                        </span>
+                                      ) : null)}
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+
+                              {todayTT?.teeTime && (
+                                <div style={{ fontSize: 12, color: '#15803d', marginTop: 6 }}>
+                                  ⏰ {formatTeeTime(todayTT.teeTime)}{todayTT.startTee === 10 && ' (hull 10)'}
+                                </div>
                               )}
                             </div>
                           );
