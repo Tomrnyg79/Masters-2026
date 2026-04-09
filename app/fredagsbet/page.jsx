@@ -211,7 +211,7 @@ export default function FredagsbetPage() {
 
                 {!locked && (
                   <button type="submit" disabled={saving} style={{ width: '100%', background: saving ? '#6b7280' : AUGUSTA_GREEN, color: '#fff', border: 'none', borderRadius: 12, height: 52, fontSize: 16, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer' }}>
-                    {saving ? 'Lagrer...' : '💾 Lagre tips'}
+                    {saving ? 'Melder på...' : '🎯 Meld meg på'}
                   </button>
                 )}
               </form>

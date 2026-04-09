@@ -357,6 +357,24 @@ export default function Home() {
 
       <div className="max-w-screen-xl mx-auto px-4 py-5">
 
+        {/* Fredagsbet-banner */}
+        <Link href="/fredagsbet" style={{ textDecoration: 'none', display: 'block', marginBottom: 16 }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)',
+            borderRadius: 12, padding: '14px 16px',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+            boxShadow: '0 2px 8px rgba(37,99,235,0.3)',
+          }}>
+            <div>
+              <div style={{ color: '#fff', fontWeight: 700, fontSize: 16 }}>🎯 Nytt sidebet er ute!</div>
+              <div style={{ color: '#bfdbfe', fontSize: 13, marginTop: 2 }}>
+                Hvem skyter lavest runde 2 på fredag? · 25 kr å delta
+              </div>
+            </div>
+            <div style={{ color: '#bfdbfe', fontSize: 20, flexShrink: 0 }}>→</div>
+          </div>
+        </Link>
+
         <MastersTop10 apiPlayers={apiPlayers} />
 
         {/* Status bar */}
