@@ -310,6 +310,12 @@ export default function Home() {
               minHeight: 40, display: 'flex', alignItems: 'center',
               borderRadius: 8, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.2)',
             }}>Premier</Link>
+            <Link href="/fredagsbet" style={{
+              color: '#fff', fontSize: 14, padding: '8px 12px',
+              minHeight: 40, display: 'flex', alignItems: 'center',
+              borderRadius: 8, textDecoration: 'none', background: 'rgba(255,255,255,0.15)',
+              border: '1px solid rgba(255,255,255,0.4)', fontWeight: 600,
+            }}>🎯 Fredagsbet</Link>
             {user === undefined ? null : user ? (
               <>
                 <Link href="/mypicks" style={{
