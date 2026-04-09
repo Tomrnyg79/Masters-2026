@@ -144,90 +144,57 @@ function PlayerCell({ player, teeTimeRounds, todayRound, currentRound }) {
   );
 }
 
-function WelcomeSection({ participants, tournamentStarted }) {
-  const { topPicks, identical } = calcStats(participants);
-  const count = participants.length;
+function MastersTop10({ apiPlayers }) {
+  if (!apiPlayers || apiPlayers.length === 0) return null;
+
+  const sorted = [...apiPlayers]
+    .filter(p => p.status !== 'WD')
+    .sort((a, b) => {
+      const aNum = a.toPar === 'E' ? 0 : parseInt(a.toPar) || 0;
+      const bNum = b.toPar === 'E' ? 0 : parseInt(b.toPar) || 0;
+      return aNum - bNum;
+    })
+    .slice(0, 10);
 
   return (
     <div style={{
       background: '#fff', borderRadius: 12,
       boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-      border: '1px solid #d1fae5',
-      padding: '20px 16px',
+      padding: '16px',
       marginBottom: 20,
     }}>
-      <div style={{ marginBottom: 16 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 8 }}>
-          Velkommen til årets vakreste eventyr 🌸
-        </h2>
-        <p style={{ color: '#4b5563', lineHeight: 1.6, marginBottom: 8, fontSize: 15 }}>
-          Tro mot tradisjonen samles vi igjen om Masters — golfens mest prestisjefylte turnering,
-          spilt på den ikoniske Augusta National Golf Club i Georgia.
-        </p>
-        <p style={{ color: '#4b5563', lineHeight: 1.6, fontSize: 15 }}>
-          Stillingslisten oppdateres <strong>automatisk hvert minutt</strong> så snart turneringen
-          starter torsdag 9. april.
-        </p>
-      </div>
-
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-        gap: 12,
-        paddingTop: 16,
-        borderTop: '1px solid #f3f4f6',
-      }}>
-        <div style={{ textAlign: 'center', padding: '14px 12px', background: '#f0fdf4', borderRadius: 8 }}>
-          <div style={{ fontSize: 40, fontWeight: 800, color: AUGUSTA_GREEN }}>{count}</div>
-          <div style={{ fontSize: 13, color: '#4b5563', marginTop: 2 }}>
-            {count === 1 ? 'deltaker registrert' : 'deltakere registrert'}
-          </div>
-          {!tournamentStarted && (
-            <Link href="/register" style={{ fontSize: 13, color: AUGUSTA_GREEN, textDecoration: 'underline', display: 'block', marginTop: 6 }}>
-              Registrer deg →
-            </Link>
-          )}
-        </div>
-
-        <div style={{ padding: '14px 12px', background: '#f9fafb', borderRadius: 8 }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
-            Mest valgte spillere
-          </div>
-          {topPicks.length === 0 ? (
-            <p style={{ fontSize: 13, color: '#9ca3af' }}>Ingen valg ennå</p>
-          ) : (
-            <ol>
-              {topPicks.map(([name, n], i) => (
-                <li key={name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13, marginBottom: 4 }}>
-                  <span style={{ color: '#374151' }}>{i + 1}. {name}</span>
-                  <span style={{ fontSize: 11, fontWeight: 700, padding: '1px 6px', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 4, color: '#6b7280', marginLeft: 8, flexShrink: 0 }}>
-                    {n}x
-                  </span>
-                </li>
-              ))}
-            </ol>
-          )}
-        </div>
-
-        <div style={{ padding: '14px 12px', background: '#f9fafb', borderRadius: 8 }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
-            Like valg
-          </div>
-          {identical.length === 0 ? (
-            <p style={{ fontSize: 13, color: '#6b7280' }}>
-              {count < 2 ? 'Venter på flere deltakere' : 'Ingen har valgt nøyaktig samme 4 spillere 👏'}
-            </p>
-          ) : (
-            <div>
-              {identical.map((group, i) => (
-                <div key={i} style={{ fontSize: 13, marginBottom: 4 }}>
-                  <span style={{ color: '#d97706', fontWeight: 600 }}>Identiske: </span>
-                  <span style={{ color: '#4b5563' }}>{group.join(' & ')}</span>
-                </div>
-              ))}
+      <h2 style={{ fontSize: 16, fontWeight: 700, color: '#111827', marginBottom: 12 }}>
+        🏆 Topp 10 — The Masters
+      </h2>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {sorted.map((p, i) => {
+          const toParNum = p.toPar === 'E' ? 0 : parseInt(p.toPar) || 0;
+          const color = toParNum < 0 ? '#b91c1c' : toParNum > 0 ? '#1d4ed8' : '#4b5563';
+          const bg = toParNum < 0 ? '#fee2e2' : toParNum > 0 ? '#dbeafe' : '#f3f4f6';
+          return (
+            <div key={p.id || p.name} style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              padding: '7px 10px', borderRadius: 8,
+              background: i === 0 ? '#fffbeb' : '#f9fafb',
+              border: i === 0 ? '1px solid #fde68a' : '1px solid #f3f4f6',
+            }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#6b7280', width: 20, textAlign: 'center', flexShrink: 0 }}>
+                {i + 1}
+              </span>
+              <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: '#111827', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {p.name}
+              </span>
+              <span style={{ fontSize: 13, fontWeight: 700, padding: '2px 8px', borderRadius: 4, background: bg, color, flexShrink: 0 }}>
+                {p.toPar === 'E' || p.toPar === '0' ? 'E' : toParNum > 0 ? `+${toParNum}` : p.toPar}
+              </span>
+              {p.thru && (
+                <span style={{ fontSize: 12, color: '#9ca3af', flexShrink: 0, minWidth: 36, textAlign: 'right' }}>
+                  {p.thru === 'F' ? 'F' : `H${p.thru}`}
+                </span>
+              )}
             </div>
-          )}
-        </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -368,7 +335,10 @@ export default function Home() {
 
       <div className="max-w-screen-xl mx-auto px-4 py-5">
 
-        <WelcomeSection participants={participants} tournamentStarted={tournamentStarted} />
+        {tournamentStarted
+          ? <MastersTop10 apiPlayers={apiPlayers} />
+          : <WelcomeSection participants={participants} tournamentStarted={tournamentStarted} />
+        }
 
         {/* Status bar */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
