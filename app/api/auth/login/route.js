@@ -4,7 +4,8 @@ import { supabase } from '../../../../lib/supabase';
 import { createToken } from '../../../../lib/auth';
 
 export async function POST(request) {
-  const { username, password } = await request.json();
+  const { username: rawUsername, password } = await request.json();
+  const username = rawUsername?.trim();
 
   if (!username || !password) {
     return NextResponse.json({ error: 'Fyll inn brukernavn og passord' }, { status: 400 });
