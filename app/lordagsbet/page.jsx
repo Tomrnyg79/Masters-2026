@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 const AUGUSTA_GREEN = '#006747';
-const DEADLINE = new Date('2026-04-11T11:40:00Z'); // Lørdag 13:40 norsk tid
+const DEADLINE = new Date('2026-04-11T13:30:00Z'); // Lørdag 15:30 norsk tid
 
 export default function LordagsbetPage() {
   const [user, setUser] = useState(undefined);
@@ -181,7 +181,7 @@ export default function LordagsbetPage() {
               ['🔢', 'Gjett også nøyaktig antall slag spilleren skyter i R3 (tiebreaker).'],
               ['🏆', 'Vinneren er den som plukket spilleren som klatret flest plasser i runde 3.'],
               ['⚖️', 'Tiebreaker: Hvis to plukker spillere som klatrer like mange plasser → den som gjettet nærmest antall R3-slag vinner.'],
-              ['⏰', 'Frist: lørdag 11. april kl. 13:40 norsk tid.'],
+              ['⏰', 'Frist: lørdag 11. april kl. 15:30 norsk tid — når første gruppe i runde 3 teer av.'],
               ['🔒', 'Etter fristen kan ikke tips endres. Listen oppdateres automatisk hvert minutt.'],
               ['📲', 'Vinneren får pengene direkte på Vipps når resultatet er klart.'],
             ].map(([icon, text]) => (
