@@ -311,11 +311,16 @@ export default function Home() {
               borderRadius: 8, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.2)',
             }}>Premier</Link>
             <Link href="/fredagsbet" style={{
+              color: '#86efac', fontSize: 14, padding: '8px 12px',
+              minHeight: 40, display: 'flex', alignItems: 'center',
+              borderRadius: 8, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.2)',
+            }}>🎯 Fredagsbet</Link>
+            <Link href="/lordagsbet" style={{
               color: '#fff', fontSize: 14, padding: '8px 12px',
               minHeight: 40, display: 'flex', alignItems: 'center',
               borderRadius: 8, textDecoration: 'none', background: 'rgba(255,255,255,0.15)',
               border: '1px solid rgba(255,255,255,0.4)', fontWeight: 600,
-            }}>🎯 Fredagsbet</Link>
+            }}>📈 Lørdagsbet</Link>
             {user === undefined ? null : user ? (
               <>
                 <Link href="/mypicks" style={{
@@ -357,23 +362,41 @@ export default function Home() {
 
       <div className="max-w-screen-xl mx-auto px-4 py-5">
 
-        {/* Fredagsbet-banner */}
-        <Link href="/fredagsbet" style={{ textDecoration: 'none', display: 'block', marginBottom: 16 }}>
+        {/* Lørdagsbet-banner */}
+        <Link href="/lordagsbet" style={{ textDecoration: 'none', display: 'block', marginBottom: 8 }}>
           <div style={{
-            background: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)',
+            background: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)',
             borderRadius: 12, padding: '14px 16px',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
-            boxShadow: '0 2px 8px rgba(37,99,235,0.3)',
+            boxShadow: '0 2px 8px rgba(124,58,237,0.3)',
           }}>
             <div>
-              <div style={{ color: '#fff', fontWeight: 700, fontSize: 16 }}>🎯 Nytt sidebet er ute!</div>
-              <div style={{ color: '#bfdbfe', fontSize: 13, marginTop: 2 }}>
-                Hvem skyter lavest runde 2 på fredag? · 25 kr å delta
+              <div style={{ color: '#fff', fontWeight: 700, fontSize: 16 }}>📈 Lørdagsbet er ute!</div>
+              <div style={{ color: '#ddd6fe', fontSize: 13, marginTop: 2 }}>
+                Hvem klatrer mest i runde 3? · 25 kr å delta
               </div>
             </div>
-            <div style={{ color: '#bfdbfe', fontSize: 20, flexShrink: 0 }}>→</div>
+            <div style={{ color: '#ddd6fe', fontSize: 20, flexShrink: 0 }}>→</div>
           </div>
         </Link>
+
+        {/* Fredagsbet vinner-banner */}
+        <div style={{
+          background: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
+          borderRadius: 12, padding: '12px 16px', marginBottom: 16,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+          boxShadow: '0 2px 8px rgba(217,119,6,0.25)',
+        }}>
+          <div>
+            <div style={{ color: '#fff', fontWeight: 700, fontSize: 15 }}>🏆 Fredagsbet: Jonny vant!</div>
+            <div style={{ color: '#fef3c7', fontSize: 13, marginTop: 2 }}>
+              Vipps 25 kr til Jonny · 90146314
+            </div>
+          </div>
+          <Link href="/fredagsbet" style={{ color: '#fef3c7', fontSize: 13, textDecoration: 'underline', flexShrink: 0 }}>
+            Se detaljer
+          </Link>
+        </div>
 
         <MastersTop10 apiPlayers={apiPlayers} />
 
